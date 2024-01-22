@@ -174,9 +174,14 @@ class LikeAPI(APIView):
         
 
 class FriendRequestAPI(APIView):
+    
     permission_classes = [IsAuthenticated]
+    def get(self, request, format= None):
+        friends_requests = Friend.objects.filter(friend = request.user, friend_request =  0)
+        serializer = FriendRequestSerializer(friends_requests, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     def post(self, request, format=None):
-        print(request.data.get('friend_request_username'), '_________-	')
         user =  User.objects.get(username = request.data.get('friend_request_username')) 
         request.data['current_user'] = request.user.id
         request.data['friend'] = user.id
@@ -200,6 +205,7 @@ class FriendRequestAPI(APIView):
         return Response({"msg" : "Unfollow Friend"}, status=status.HTTP_204_NO_CONTENT)   
     
 class NotificationAPI(generics.ListAPIView):
+    
     permission_classes = [IsAuthenticated]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer

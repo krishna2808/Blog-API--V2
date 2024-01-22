@@ -28,8 +28,18 @@
 		{
 			"name": "Login",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"kk8140631@gmail.com\",\n    \"password\":\"3333\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8000/account/signin/",
 				"description": "User login acoount with username and password and get jwt token."
 			},
 			"response": []
@@ -41,14 +51,14 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\" : \"kk@gmail.com\"\n}",
+					"raw": "{\n    \"email\" : \"kk8140631@gmail.com\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://0.0.0.0/user/password-reset/"
+				"url": "http://localhost:8000/account/password-reset/"
 			},
 			"response": []
 		},
@@ -342,6 +352,21 @@
 		},
 		{
 			"name": "Friend Request Send or Following",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA1OTc4MTUwLCJpYXQiOjE3MDU5NDIxNTAsImp0aSI6IjVkNDU1YmU2MjdlZjQ5OTU5MzJjMDgyMGEyNDliNjM3IiwidXNlcl9pZCI6NX0.EBqHThn0sq-ANxtStuD5--x8HkIyzswRK7FTjks-npU",
+						"type": "text"
+					}
+				],
+				"url": "http://localhost:8000/post/friend-request/"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend Request Send or Following Copy",
 			"request": {
 				"method": "POST",
 				"header": [
