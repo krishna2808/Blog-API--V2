@@ -9,26 +9,53 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from .tasks import * 
+from rest_framework.generics import GenericAPIView 
+from django.core.cache import cache
+import time
+import redis
 
 import logging as log
 from drf_yasg.utils import swagger_auto_schema
+from datetime import datetime , timedelta
+from django.db.models import Q
+from .pagination import CustomLimitOffsetPagination
 
 
 class PostList(generics.ListAPIView):
-    queryset = Post.objects.all()
+    # queryset = Post.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer
-from rest_framework.generics import GenericAPIView 
+    pagination_class = CustomLimitOffsetPagination
+    # def get(self,request,format=None):
+    #     friend_queryset = list(Friend.objects.filter(current_user = request.user, friend_request = 1).values("friend"))
+    #     post = Post.objects.select_related("user").filter(Q(user__in = friend_queryset) | Q(user__is_private_account=False))
+    #     serializer = PostSerializer(post, many=True)
+    #     # if "posts" in cache:
+    #     #     print("cache ----- ", cache)
+    #     #     return Response(cache.get('posts'), status=status.HTTP_200_OK)
+    #     # else:
+    #     #     friend_queryset = list(Friend.objects.filter(current_user = request.user, friend_request = 1).values("friend"))
+    #     #     post = Post.objects.filter(Q(user__in = friend_queryset) | Q(user__is_private_account=False))
+    #     #     serializer = PostSerializer(post, many=True)
+    #     #     cache.set("posts", serializer.data, timeout=60*60)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        
+    def get_queryset(self):
+        friend_queryset = list(Friend.objects.filter(current_user = self.request.user, friend_request = 1).values("friend"))
+        return Post.objects.select_related("user").filter(Q(user__in = friend_queryset) | Q(user__is_private_account=False))
+    
+    
 
 class PostCreateAndListAndUpdateDescostory(APIView):
     permission_classes = [IsAuthenticated]
     
     def valid_post_user(self, post_id, user_id):
         try:
-            valid_post_user = Post.objects.get(id=post_id, user__id = user_id)
+            valid_post_user_object = Post.objects.get(id=post_id, user__id = user_id)
         except Post.DoesNotExist:
             raise Http404
-        return valid_post_user
+        return valid_post_user_object
     
     def get(self, request, format=None):
         post = Post.objects.filter(user__id = request.user.id)
@@ -43,7 +70,6 @@ class PostCreateAndListAndUpdateDescostory(APIView):
 		}                 
         return Response({'own_post' : serializer.data, 'friends_context' : friends_context  }, status=status.HTTP_200_OK)
     def post(self, request, format=None):
-        log.info('post ----------')
         request.data['user'] = request.user.id
         post_data = request.data 
         serializer = PostSerializer(data=post_data) 
@@ -205,12 +231,9 @@ class FriendRequestAPI(APIView):
         return Response({"msg" : "Unfollow Friend"}, status=status.HTTP_204_NO_CONTENT)   
     
 class NotificationAPI(generics.ListAPIView):
-    
     permission_classes = [IsAuthenticated]
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(receiver = user)
-  

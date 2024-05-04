@@ -90,9 +90,9 @@ class User(AbstractUser, PermissionsMixin):
             self.set_password(self.password)  # Replace 'default_password' with your desired default password
         super().save(*args, **kwargs)"""
 
-def get_username(instance):
-    print("instance", instance)
-    return User.objects.get(user)
+# def get_username(instance):
+#     print("instance", instance)
+#     return User.objects.get(user)
 
 
 
