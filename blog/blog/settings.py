@@ -15,6 +15,7 @@ import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
+import boto3
 load_dotenv()
 
 
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     'account',
     'post',
     'chat',
+    # For upload file s3 bucket
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -130,14 +133,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-# STATICFILES_DIRS = [
-# 	os.path.join(BASE_DIR, 'static')
-# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -145,14 +140,64 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+
+S3_STORAGE_AVAILABLE = True  # Set this to False if S3 access is not available
+
+
+
+# If S3 storage is available, configure S3 settings
+if S3_STORAGE_AVAILABLE:
+    """
+    Create bucket and assign policy and CORS for bucket and change Object Ownership to ACLs Enable.
+    """
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_S3_REGION_NAME =  os.getenv("AWS_S3_REGION_NAME")
+    AWS_DEFAULT_ACL = os.getenv("AWS_DEFAULT_ACL")  # Optional: Set appropriate ACL for your use case
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    # s3 public media settings
+
+    PUBLIC_MEDIA_LOCATION = 'media'	
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    """
+    We will not use default file storage because in this default file storage some littel bit problem. like when uplod
+    image it is uploaded successfully but it is not media folder is not created in s3 bucket.
+    """
+    DEFAULT_FILE_STORAGE = 'blog.file_storage.PublicMediaStorage'
+    
+    # s3 static settings
+    AWS_LOCATION = 'static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'    
+    STATICFILES_STORAGE = 'blog.file_storage.StaticStorage'
+else:
+    # If S3 storage is not available, fall back to local storage  
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+# MEDIA_URL = '/mediafiles/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+
+
+
 AUTH_USER_MODEL = 'account.User'
-
-
-
 
 
 REST_FRAMEWORK = {
@@ -211,3 +256,8 @@ CACHES = {
         # "KEY_PREFIX": "example"
     }
 }
+
+
+
+
+
