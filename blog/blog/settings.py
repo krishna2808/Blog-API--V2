@@ -19,7 +19,6 @@ import boto3
 load_dotenv()
 
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -92,13 +91,32 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+# }
+
+
+
+
+
 DATABASES = {
+    
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'blog_db',
+    #     'USER': 'mysuperuser',
+    #     'PASSWORD': 'password',
+    #     'HOST': 'blog-db-instance.cfcqskm446zc.ap-south-1.rds.amazonaws.com',  # Or your database host address
+    #     'PORT': '5432',       # Or your database port
+    # }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -152,7 +170,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
-S3_STORAGE_AVAILABLE = True  # Set this to False if S3 access is not available
+S3_STORAGE_AVAILABLE = False  # Set this to False if S3 access is not available
 
 
 
@@ -256,8 +274,5 @@ CACHES = {
         # "KEY_PREFIX": "example"
     }
 }
-
-
-
 
 
