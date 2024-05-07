@@ -9,7 +9,7 @@ services:
         build:
             context: .
             #dockerfile: bicycle/docker/Dockerfile
-        #entrypoint: /app/project-bicycle/bicycle/docker/backend/entry-point/server-entrypoint.sh
+        entrypoint: /app/project-blog/blog/docker/backend/entry-point/server-entrypoint.sh
         volumes:
             - backend_container_data:/app/blog-project/
         ports:
