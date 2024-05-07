@@ -24,15 +24,15 @@ services:
             MYSQL_USER: root
             MYSQL_PASSWORD: password
             MYSQL_PORT: 3306
-        #depends_on:
-        #    - mysql_blog
+        depends_on:
+           - mysql_blog
 
-    redis_blog:
-        container_name: redis.blog
-        restart: unless-stopped
-        image: redis:7.0.5-alpine 
-        expose:
-            - 6379
+    # redis_blog:
+    #     container_name: redis.blog
+    #     restart: unless-stopped
+    #     image: redis:7.0.5-alpine 
+    #     expose:
+    #         - 6379
 
     mysql_blog:
         image: mysql:8
@@ -45,15 +45,15 @@ services:
         volumes:
           - mysql-container-data:/var/lib/mysql
 
-    nginx_blog:
-      #image: nginx:alpine
-      container_name: nginx.webserver.blog
-      build: nginx/
-      ports:
-        - 80:80
-        - 443:443
-      depends_on:
-        - web_blog
+    # nginx_blog:
+    #   #image: nginx:alpine
+    #   container_name: nginx.webserver.blog
+    #   build: nginx/
+    #   ports:
+    #     - 80:80
+    #     - 443:443
+    #   depends_on:
+    #     - web_blog
 
 
 volumes:
