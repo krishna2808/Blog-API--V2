@@ -1,7 +1,8 @@
 FROM python:3.10
 #FROM python:3.10-slim
 #install nano text editor in docker container
-RUN apt-get update -y && apt-get install nano -y && apt-get install nginx -y &&  apt-get install -y gunicorn systemd && apt-get install net-tools
+RUN apt-get update -y && apt-get install nano -y && apt-get install nginx -y &&  apt-get install -y gunicorn systemd && apt-get install net-tools &&  apt-get install libmariadb-dev-compat libmariadb-dev
+
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
