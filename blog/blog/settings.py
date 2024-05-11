@@ -186,7 +186,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
-S3_STORAGE_AVAILABLE = True  # Set this to False if S3 access is not available
+S3_STORAGE_AVAILABLE = False  # Set this to False if S3 access is not available
 
 
 
