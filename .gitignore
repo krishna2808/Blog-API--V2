@@ -277,6 +277,9 @@ pyrightconfig.json
 # -------------------------- terraform --- ignore files --------------- 
 
 
+# -------------------------- terraform --- ignore files --------------- 
+
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/terraform
 # Edit at https://www.toptal.com/developers/gitignore?templates=terraform
@@ -284,8 +287,9 @@ pyrightconfig.json
 ### Terraform ###
 # Local .terraform directories
 **/.terraform/*
+.terraform/terraform.*
 
-./terraform/.terraform/*
+# ./terraform/.terraform/*
 
 # .tfstate files
 *.tfstate
