@@ -91,17 +91,6 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-# }
-
-
-
-
-
 DATABASES = {
     # sqlite
     'default': {
@@ -126,11 +115,7 @@ DATABASES = {
     #     'PASSWORD': 'password',
     #     'HOST': 'mysql.blog',   # Container name
     #     'PORT': '3306',        
-    # }
-    
-    
-    
-    
+    # }  
     
 }
 
@@ -222,13 +207,10 @@ else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
-
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # MEDIA_URL = '/mediafiles/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-
 
 
 AUTH_USER_MODEL = 'account.User'
@@ -290,5 +272,3 @@ CACHES = {
         # "KEY_PREFIX": "example"
     }
 }
-
-
