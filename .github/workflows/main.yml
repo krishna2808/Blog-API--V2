@@ -5,9 +5,10 @@ name: Django CI/CD Pipeline
     # push or pull request github action trigger automatically 	
     push:
         branches: [main]  # Adjust the branch name as needed
-    pull_request:
-        branches: [main]  # Adjust the branch name as needed
+    # pull_request:
+    #     branches: [main]  # Adjust the branch name as needed
 jobs:
+  
   build_and_test:
     name: Build and Test
     runs-on: ubuntu-latest
@@ -26,30 +27,38 @@ jobs:
         run: python blog/manage.py test
   deploy:
     name: Deploy to EC2 on main branch push
-    needs: build_and_test
+    # needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Deploy to Server 1
-        uses: easingthemes/ssh-deploy@main
-        env: 
-            SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-            REMOTE_HOST: ${{ secrets.HOST_DNS }}
-            REMOTE_USER: ${{ secrets.USERNAME }}
-            TARGET: ${{ secrets.TARGET_DIR }}
+        run: |
+            ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@13.202.67.148 'bash -s' < deploy_script.sh
+        env:
+           ACTIONS_RUNNER_DEBUG: false
 
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-            host: ${{ secrets.HOST_DNS }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.EC2_SSH_KEY }}
-            script: |
-                cd /app/blog_project/
-                sudo git config --global --add safe.directory /app/blog_project 
-                sudo git pull origin main  
-                source venv/bin/activate
-                cd /app/blog_project/blog/ 
-                python manage.py makemigrations 
-                python manage.py migrate"
+
+
+
+    #     uses: easingthemes/ssh-deploy@main
+    #     env: 
+    #         SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+    #         REMOTE_HOST: ${{ secrets.HOST_DNS }}
+    #         REMOTE_USER: ${{ secrets.USERNAME }}
+    #         TARGET: ${{ secrets.TARGET_DIR }}
+
+    #   - name: Executing remote ssh commands using ssh key
+    #     uses: appleboy/ssh-action@master
+    #     with:
+    #         host: ${{ secrets.HOST_DNS }}
+    #         username: ${{ secrets.USERNAME }}
+    #         key: ${{ secrets.EC2_SSH_KEY }}
+    #         script: |
+    #             cd /app/blog_project/
+    #             sudo git config --global --add safe.directory /app/blog_project 
+    #             sudo git pull origin main  
+    #             source venv/bin/activate
+    #             cd /app/blog_project/blog/ 
+    #             python manage.py makemigrations 
+    #             python manage.py migrate"
