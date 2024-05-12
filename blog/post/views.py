@@ -141,7 +141,8 @@ class CommentAPI(APIView):
         serializer = CommentSerilizer(data=comment_data) 
         if serializer.is_valid():
             serializer.save()
-            post_notification.delay(request.user.id, post_id = serializer.data['post'], type = "commented")
+            # post_notification.delay(request.user.id, post_id = serializer.data['post'], type = "commented")
+            post_notification(request.user.id, post_id = serializer.data['post'], type = "commented")
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
