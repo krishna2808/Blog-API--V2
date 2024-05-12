@@ -18,7 +18,7 @@ sudo systemctl restart nginx
 sudo add-apt-repository ppa:deadsnakes/ppa -y 
 sudo apt-get update -y 
 sudo apt-get install python3.10 -y
-sudo apt-get install python3.10-venv
+sudo apt-get install python3.10-venv -y
 
 # project setup in ec2 instance 
 cd /app/blog_project/
