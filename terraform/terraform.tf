@@ -183,7 +183,8 @@ resource "aws_instance" "public_instance_tf" {
 
   # Use remote-exec provisioner to update project setup from GitHub
   provisioner "remote-exec" {
-    inline = [file("project_setup_script.sh")]
+    inline = [file("project_setup_script_without_docker_container.sh")]
+    # inline = [file("project_setup_script_docker_container.sh")]
 
     connection {
       type        = "ssh"

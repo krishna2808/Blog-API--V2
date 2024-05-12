@@ -1,13 +1,15 @@
 name: Django CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main  # Adjust the branch name as needed
-  pull_request:
-    branches:
-      - main  # Adjust the branch name as needed
+  # push code and github action trigger with manually 
+  workflow_dispatch:
+  #push or pull request github action trigger automatically 	
+#   push:
+#     branches: [main]  # Adjust the branch name as needed
+#   pull_request:
+#     branches: [main]  # Adjust the branch name as needed
 
+   
 jobs:
   build_and_test:
     name: Build and Test

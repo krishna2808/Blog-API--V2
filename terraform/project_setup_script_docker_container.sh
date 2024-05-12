@@ -14,6 +14,7 @@ sudo cat /app/blog_project/nginx/nginx.conf > /etc/nginx/sites-available/blog_pr
 sudo ln -s /etc/nginx/sites-available/blog_project.conf  /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
 
+# project setup in docker container on aws ec2 instance 
 sudo apt-get install -y docker
 sudo apt install -y docker.io
 sudo apt-get install -y docker-compose
