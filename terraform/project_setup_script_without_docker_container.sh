@@ -7,6 +7,11 @@ sudo systemctl enable nginx
 sudo touch /etc/nginx/sites-available/blog_project.conf
 sudo chmod 777 /etc/nginx/sites-available/blog_project.conf
 
+# set linux environemnt 
+
+GITHUB_ACCESS_TOKEN="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"
+GITHUB_USERNAME="krishna2808"
+
 sudo mkdir -p /app
 # sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
 sudo git clone https://${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN=}@github.com/krishna2808/Blog-API--V2.git /app/blog_project

@@ -1,42 +1,42 @@
 name: Django CI/CD Pipeline
-
-on:
-  # push code and github action trigger with manually 
-  workflow_dispatch:
-  #push or pull request github action trigger automatically 	
-#   push:
-#     branches: [main]  # Adjust the branch name as needed
-#   pull_request:
-#     branches: [main]  # Adjust the branch name as needed
-
-   
+'on':
+    # push code and github action trigger with manually 
+    # workflow_dispatch:
+    # push or pull request github action trigger automatically 	
+    push:
+        branches: [main]  # Adjust the branch name as needed
+    pull_request:
+        branches: [main]  # Adjust the branch name as needed
 jobs:
   build_and_test:
     name: Build and Test
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r blog/requirements.txt
-
       - name: Run tests
         run: python blog/manage.py test
-
   deploy:
-    name: Deploy to testing
+    name: Deploy to AWS
     needs: build_and_test
     runs-on: ubuntu-latest
-
     steps:
-      - name: project setup in ci/c
-        run : echo "project setup run ci/ci"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: '${{ secrets.SSH_PRIVATE_KEY }}'
+      - name: SSH into EC2 instance
+        run: >
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@65.1.132.214 "cd
+          /app/blog_project/ && git pull origin main && cd blog/ python manage.py
+          makemigrations && python manage.py migrate"
