@@ -1,2 +1,2 @@
 # Blog-API--V2 
-python --version == 3.11.7
+python --version == python:3.10
