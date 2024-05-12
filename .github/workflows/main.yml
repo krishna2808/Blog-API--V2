@@ -25,18 +25,29 @@ jobs:
       - name: Run tests
         run: python blog/manage.py test
   deploy:
-    name: Deploy to AWS
+    name: Deploy to EC2 on main branch push
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Deploy to Server 1
+        uses: easingthemes/ssh-deploy@main
+        env: 
+            SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+            REMOTE_HOST: ${{ secrets.HOST_DNS }}
+            REMOTE_USER: ${{ secrets.USERNAME }}
+            TARGET: ${{ secrets.TARGET_DIR }}
+
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: '${{ secrets.SSH_PRIVATE_KEY }}'
-      - name: SSH into EC2 instance
-        run: >
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@65.1.132.214 "cd
-          /app/blog_project/ && git pull origin main && cd blog/ python manage.py
-          makemigrations && python manage.py migrate"
+            host: ${{ secrets.HOST_DNS }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+                cd /app/blog_project/ && git pull origin main  
+                source venv/bin/activate
+                cd /app/blog_project/blog/ 
+                python manage.py makemigrations 
+                python manage.py migrate"
