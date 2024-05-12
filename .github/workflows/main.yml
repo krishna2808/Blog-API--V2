@@ -28,7 +28,7 @@ jobs:
           pip install -r blog/requirements.txt
 
       - name: Run tests
-        run: python manage.py test
+        run: python blog/manage.py test
 
   deploy:
     name: Deploy to testing
