@@ -8,7 +8,8 @@ sudo touch /etc/nginx/sites-available/blog_project.conf
 sudo chmod 777 /etc/nginx/sites-available/blog_project.conf
 
 sudo mkdir -p /app
-sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
+# sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
+sudo git clone https://krishna2808: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@github.com/krishna2808/Blog-API--V2.git /app/blog_project
 
 sudo chmod -R 777 /app/*
 sudo cat /app/blog_project/nginx/nginx.conf > /etc/nginx/sites-available/blog_project.conf
