@@ -31,7 +31,7 @@ jobs:
         run: python manage.py test
 
   deploy:
-    name: Deploy to AWS
+    name: Deploy to testing
     needs: build_and_test
     runs-on: ubuntu-latest
 
