@@ -39,8 +39,4 @@ jobs:
       - name: Deploy to Server 1
         run: |
             echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} < 
-            '
-            sudo apt-get update 
-            echo "krishna hello"
-            '
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} 'sudo apt-get update'
