@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Deploy to Server 1
         run: |
-            ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{secrets.HOST_DNS}}
+            ssh -o StrictHostKeyChecking=no -i   ${{ secrets.EC2_SSH_KEY }} ubuntu@${{secrets.HOST_DNS}}
             echo "Hello krishna"
         env:
            ACTIONS_RUNNER_DEBUG: false
