@@ -5,4 +5,4 @@ sudo git pull origin main
 source venv/bin/activate
 cd /app/blog_project/blog/ 
 python manage.py makemigrations 
-python manage.py migrate"
+python manage.py migrate
