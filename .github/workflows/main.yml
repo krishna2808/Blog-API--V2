@@ -34,7 +34,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Deploy to Server 1
         run: |
-            ssh -i ${{ secrets.EC2_SSH_KEY }} ${{secrets.HOST_DNS}} 'bash -s' < deploy_script.sh
+            # ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@13.202.67.148 'bash -s' < deploy_script.sh
+            ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@13.202.67.148 
+            echo "Hello krishna"
         env:
            ACTIONS_RUNNER_DEBUG: false
 
