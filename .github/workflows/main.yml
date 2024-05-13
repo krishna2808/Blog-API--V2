@@ -28,13 +28,19 @@ jobs:
   deploy:
     name: Deploy to EC2 on main branch push
     # needs: build_and_test
+    env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        HOSTNAME: ${{secrets.HOST_DNS}}
+        USER_NAME: ${{secrets.USERNAME}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Deploy to Server 1
         run: |
-            ssh -o StrictHostKeyChecking=no -i   ${{ secrets.EC2_SSH_KEY }} ubuntu@${{secrets.HOST_DNS}}
-            echo "Hello krishna"
-        env:
-           ACTIONS_RUNNER_DEBUG: false
+            echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME}
+            '
+            sudo apt-get update 
+            echo "krishna hello"
+            '
