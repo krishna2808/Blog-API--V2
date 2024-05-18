@@ -31,4 +31,4 @@ python manage.py collectstatic --noinput
 gunicorn -c gunicorn.conf.py blog.wsgi
 
 
-
+	
