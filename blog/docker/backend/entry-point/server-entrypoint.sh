@@ -28,7 +28,7 @@ python manage.py collectstatic --noinput
 
 # gunicorn blog.wsgi:application --bind 0.0.0.0:8000 --reload
 # ---------- OR ------------------- we will use configruration file with worker 
-gunicorn -c gunicorn.conf.py myproject.wsgi
+gunicorn -c gunicorn.conf.py blog.wsgi
 
 
 
