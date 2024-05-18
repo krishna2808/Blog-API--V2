@@ -21,6 +21,19 @@ from django.db.models import Q
 from .pagination import CustomLimitOffsetPagination
 
 
+from django.http import JsonResponse
+
+log = log.getLogger(__name__)
+
+
+def fun(request):
+     log.info("function ---------------- ")
+     print("print --------------------------", x)
+     log.info("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+     return JsonResponse({"msg" : "Unfollow Friend"})
+
+
+
 class PostList(generics.ListAPIView):
     # queryset = Post.objects.all()
     permission_classes = [IsAuthenticated]

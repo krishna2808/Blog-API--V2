@@ -9,8 +9,8 @@ urlpatterns = [
     path('post-like/', LikeAPI.as_view(), name="post-like"),
     path('friend-request/', FriendRequestAPI.as_view(), name="friend-request"),
     path('notification/', NotificationAPI.as_view(), name="notification"),
+    path('fun/', fun, name="fun"),
+    
     # path('own-post/', PostRetrieveAndUpdateAndDestory.as_view(), name="own-post"),
-    # path('admin/', admin.site.urls),
-    # path('', include("post.urls")),
 	
 ]
