@@ -9,7 +9,11 @@ sudo touch /etc/nginx/sites-available/blog_project.conf
 sudo chmod +777 /etc/nginx/sites-available/blog_project.conf
 
 sudo mkdir -p /app
-sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
+GITHUB_ACCESS_TOKEN="a"
+GITHUB_USERNAME="a"
+
+# sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
+sudo git clone https://${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN=}@github.com/krishna2808/Blog-API--V2.git /app/blog_project
 sudo cat /app/blog_project/nginx/nginx.conf > /etc/nginx/sites-available/blog_project.conf
 sudo ln -s /etc/nginx/sites-available/blog_project.conf  /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
@@ -23,4 +27,4 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 cd /app/blog_project/
-sudo docker-compose up -d
+sudo docker-compose up -d	

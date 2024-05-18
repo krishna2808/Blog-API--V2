@@ -1,5 +1,5 @@
 #!/bin/bash
-# project setup in ec2 instance or linux system. 
+# project setup in ec2 instance. if you want to configration in local then you need to use project setup with docker.sh. because it will harmfull your system or not easy setup.
 sudo apt-get update
 sudo apt-get install -y git
 sudo apt-get install -y nginx
@@ -47,8 +47,8 @@ python manage.py migrate  --noinput
 
 # gunicorn setup in project. 
 # sudo apt-get install gunicorn -y 
-sudo cp /app/project-blog/blog/docker/gunicorn/gunicorn.service /etc/systemd/system/  
-sudo cp /app/project-blog/blog/docker/gunicorn/gunicorn.socket /etc/systemd/system/   
+sudo cp /app/project-blog/blog/gunicorn/gunicorn.service /etc/systemd/system/  
+sudo cp /app/project-blog/blog/gunicorn/gunicorn.socket /etc/systemd/system/   
 
 
 
