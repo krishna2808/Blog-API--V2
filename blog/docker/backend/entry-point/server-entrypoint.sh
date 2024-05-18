@@ -17,8 +17,13 @@ python manage.py collectstatic --noinput
 #gunicorn bicycle.wsgi:application --bind 0.0.0.0:8000
 
 # we are using development environment. it is restart everytime
-gunicorn blog.wsgi:application --bind 0.0.0.0:8000 --reload
-
-
+# gunicorn blog.wsgi:application --bind 0.0.0.0:8000 --reload
 
 #python manage.py runserver 0.0.0.0:8000
+
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl daemon-reload
+

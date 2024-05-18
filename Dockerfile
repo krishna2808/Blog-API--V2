@@ -36,7 +36,7 @@ RUN pip install -r requirements.txt
 
 
 # Create service for gunicorn server. it is possible to start server without create service but we will start, restart and stop gunicorn server using system service. 
-RUN cp /app/project-blog/blog/docker/gunicorn/gunicorn.service /etc/systemd/ && cp /app/project-blog/blog/docker/gunicorn/gunicorn.socket /etc/systemd/   
+RUN cp /app/project-blog/blog/docker/gunicorn/gunicorn.service /etc/systemd/system/ && cp /app/project-blog/blog/docker/gunicorn/gunicorn.socket /etc/systemd/system/   
 #RUN systemctl start gunicorn.socket && systemctl enable gunicorn.socket
 
 RUN chmod +x /app/project-blog/blog/docker/backend/entry-point/server-entrypoint.sh
