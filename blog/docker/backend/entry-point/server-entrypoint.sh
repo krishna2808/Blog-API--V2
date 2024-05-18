@@ -13,6 +13,7 @@ done
 # done
 
 python manage.py collectstatic --noinput
+
 # we are using production environment. it is not restart everytime
 #gunicorn bicycle.wsgi:application --bind 0.0.0.0:8000
 
@@ -21,9 +22,13 @@ python manage.py collectstatic --noinput
 
 #python manage.py runserver 0.0.0.0:8000
 
-systemctl start gunicorn.socket
-systemctl enable gunicorn.socket
-systemctl start gunicorn
-systemctl enable gunicorn
-systemctl daemon-reload
+
+# Note : I have read some articals they have give me direct run gunicorn command. it is not required to setup gunicorn service and socket file 
+
+
+# gunicorn blog.wsgi:application --bind 0.0.0.0:8000 --reload
+# ---------- OR ------------------- we will use configruration file with worker 
+gunicorn -c gunicorn.conf.py myproject.wsgi
+
+
 
