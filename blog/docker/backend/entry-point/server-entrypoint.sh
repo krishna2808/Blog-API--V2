@@ -21,9 +21,9 @@ python manage.py collectstatic --noinput
 
 #python manage.py runserver 0.0.0.0:8000
 
-sudo systemctl start gunicorn.socket
-sudo systemctl enable gunicorn.socket
-sudo systemctl start gunicorn
-sudo systemctl enable gunicorn
-sudo systemctl daemon-reload
+systemctl start gunicorn.socket
+systemctl enable gunicorn.socket
+systemctl start gunicorn
+systemctl enable gunicorn
+systemctl daemon-reload
 
