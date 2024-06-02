@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     
-    # 'daphne', # to run asgi server
+    'daphne', # to run asgi server
     'django.contrib.staticfiles',
     'drf_yasg',
     # when rest_framework include in setting then it is given option to crud operation from brower and when you have installed pip install Markdown
@@ -85,7 +85,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'blog.wsgi.application'
+# WSGI_APPLICATION = 'blog.wsgi.application'
+ASGI_APPLICATION = "blog.asgi.application"
 
 
 # Database
@@ -264,16 +265,16 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 # When we will use then uncomment code. this moment is not required to run caches
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient"
-#         },
-#         # "KEY_PREFIX": "example"
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        # "KEY_PREFIX": "example"
+    }
+}
 
 
 
@@ -329,3 +330,10 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 #         },
 #     },
 # }
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

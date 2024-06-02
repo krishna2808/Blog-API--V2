@@ -83,12 +83,15 @@ class PostCreateAndListAndUpdateDescostory(APIView):
 		}                 
         return Response({'own_post' : serializer.data, 'friends_context' : friends_context  }, status=status.HTTP_200_OK)
     def post(self, request, format=None):
-        request.data['user'] = request.user.id
-        post_data = request.data 
+        post_data = request.data.copy()
+        post_data['user'] = request.user.id
+        # post_data = request.data 
         serializer = PostSerializer(data=post_data) 
         if serializer.is_valid():
+            print("save -------- ")
             serializer.save()
-            post_notification.delay(request.user.id, post_id = serializer.data['id'], type = "posted")
+            # post_notification.delay(request.user.id, post_id = serializer.data['id'], type = "posted")
+            post_notification(request.user.id, post_id = serializer.data['id'], type = "posted")
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
