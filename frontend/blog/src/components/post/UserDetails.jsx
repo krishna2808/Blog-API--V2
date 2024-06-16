@@ -1,17 +1,20 @@
+// UserDetails.js
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../../assets/styles/main.css';
 import Header from '../common/Header';
-
+import Popup from './Popup'; // Import the Popup component
 
 const UserDetails = () => {
   const { username } = useParams();
   const location = useLocation();
   const [userDetails, setUserDetails] = useState(null);
+  const [showFollowersPopup, setShowFollowersPopup] = useState(false);
+  const [showFollowingPopup, setShowFollowingPopup] = useState(false);
   const token = localStorage.getItem('access_token');
   const profile_username = localStorage.getItem('profile_username');
-  
 
   const header = {
     'Authorization': `Bearer ${token}`,
@@ -41,6 +44,19 @@ const UserDetails = () => {
 
   const showEditProfileButton = userDetails.friends_context.is_same_user;
 
+  const openFollowersPopup = () => {
+    setShowFollowersPopup(true);
+  };
+
+  const openFollowingPopup = () => {
+    setShowFollowingPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowFollowersPopup(false);
+    setShowFollowingPopup(false);
+  };
+
   return (
     <>
       <Header/>
@@ -56,11 +72,27 @@ const UserDetails = () => {
             )}
           </div>
           <div className="profile-stats">
-            <ul>
-              <li><span className="profile-stat-count">{userDetails.user_post.length}</span> posts</li>
-              <li><span className="profile-stat-count">{userDetails.friends_context.follower_count}</span> followers</li>
-              <li><span className="profile-stat-count">{userDetails.friends_context.following_count}</span> following</li>
+
+
+          <ul>
+              {userDetails.friends_context.is_friend ? (
+                <>
+                  <li><span className="profile-stat-count">{userDetails.user_post.length}</span> posts</li>
+                  <li onClick={openFollowersPopup}><span className="profile-stat-count">{userDetails.friends_context.follower_count}</span> followers</li>
+                  <li onClick={openFollowingPopup}><span className="profile-stat-count">{userDetails.friends_context.following_count}</span> following</li>
+                </>
+              ) : (
+                <>
+                  <li><span className="profile-stat-count">{userDetails.friends_context.post_count}</span> posts</li>
+
+                  <li><span className="profile-stat-count">{userDetails.friends_context.follower_count}</span> followers</li>
+                  <li><span className="profile-stat-count">{userDetails.friends_context.following_count}</span> following</li>
+                </>
+              )}
             </ul>
+
+
+
           </div> 
         </div>
       </header>
@@ -86,6 +118,24 @@ const UserDetails = () => {
           ))}
         </div>
       </main>
+
+      {/* Popup for followers */}
+      {showFollowersPopup && (
+        <Popup
+          title="Followers"
+          items={userDetails.friends_context.follower_friends}
+          onClose={closePopup}
+        />
+      )}
+
+      {/* Popup for following */}
+      {showFollowingPopup && (
+        <Popup
+          title="Following"
+          items={userDetails.friends_context.following_friends}
+          onClose={closePopup}
+        />
+      )}
     </>
   );
 };

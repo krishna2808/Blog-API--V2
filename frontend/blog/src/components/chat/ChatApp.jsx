@@ -1,6 +1,5 @@
-// App.js
 import React, { useState } from 'react';
-import '../../assets/styles/chat.css' 
+import '../../assets/styles/chat.css';
 
 import UserChatList from './UserChatList';
 import UserChat from './UserChat';
@@ -9,8 +8,6 @@ function App() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const handleUserSelect = (user) => {
-    debugger
-    
     setSelectedUser(user);
   };
 
@@ -20,7 +17,7 @@ function App() {
         <UserChatList onSelect={handleUserSelect} />
       </div>
       <div className="user-chat">
-        {selectedUser && <UserChat user={selectedUser} />}
+        {selectedUser ? <UserChat user={selectedUser} /> : <div>Select a chat to start messaging</div>}
       </div>
     </div>
   );

@@ -94,6 +94,7 @@ const Dashboard = () => {
     localStorage.setItem('profile_username', username);
     navigate(`/user-profile/?username=${username}`);
 
+
   };
 
   return (

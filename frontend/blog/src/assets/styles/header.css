@@ -1,0 +1,22 @@
+/* main.css */
+
+/* Style the search input */
+.form-control {
+    width: 200px;
+    transition: width 0.4s ease-in-out;
+}
+
+/* Style the dropdown list */
+.list-group.position-absolute {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.list-group-item {
+    cursor: pointer;
+}
+
+.list-group-item:hover {
+    background-color: #f0f0f0;
+}

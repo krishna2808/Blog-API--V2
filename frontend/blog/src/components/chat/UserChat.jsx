@@ -1,108 +1,66 @@
-// UserChat.js
-import React, { useState,  useEffect  } from 'react';
-import '../../assets/styles/chat.css' 
-
+import React, { useState, useEffect } from 'react';
+import '../../assets/styles/chat.css';
 
 function UserChat({ user }) {
-  debugger 
   const currentUser = localStorage.getItem('username');
-  var initialMessages = user.chat_room
-
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(user.chat_room || []);
   const [newMessage, setNewMessage] = useState('');
-
-
-
-
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-      var token = localStorage.getItem('access_token')
-      var urls =  `ws://127.0.0.1:8000/ws/chat/?token=${token}`
-      // Establish WebSocket connection when the component mounts
-      const ws = new WebSocket(urls);
-  
-      ws.onopen = () => {
-        debugger
-          console.log('WebSocket connected');
-          setSocket(ws);
-      };
-  
-      ws.onmessage = (event) => {
-          // Handle incoming messages from the WebSocket server
-          const newMsg = JSON.parse(event.data);
-          setMessages((prevMessages) => [...prevMessages, newMsg]);
-      };
+    const token = localStorage.getItem('access_token');
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/?token=${token}`);
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-  
-      ws.onclose = () => {
-        console.log('WebSocket connection closed');
-      };
-  
-      return () => {
-        // Clean up WebSocket connection when the component unmounts
-        if (ws) {
-          ws.close();
-        }
-      };
-    }, []);
-  
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+      setSocket(ws);
+    };
 
+    ws.onmessage = (event) => {
+      const newMsg = JSON.parse(event.data);
+      setMessages((prevMessages) => [...prevMessages, newMsg]);
+    };
 
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
 
-    const handleSendMessage = () => {
-        if (newMessage.trim() !== '' && socket) {
-          const newMsg = {
-            message: newMessage,
-            sender: currentUser,
-            roomId: user.roomId,
-            action : "message",
-            // timestamp: new Date().toISOString(),
-          };
-          socket.send(JSON.stringify(newMsg));
-          setNewMessage('');
-        }
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      if (ws) ws.close();
+    };
+  }, []);
+
+  const handleSendMessage = () => {
+    if (newMessage.trim() !== '' && socket) {
+      const newMsg = {
+        message: newMessage,
+        sender: currentUser,
+        roomId: user.roomId,
+        action: "message",
       };
+      socket.send(JSON.stringify(newMsg));
+      setNewMessage('');
+    }
+  };
 
   return (
-
-
-
     <div>
       <h2 className="chat-header">
-        {/* <img
-          src={user.members[0].image}
-          alt={`${user.members[0].username}'s profile`}
-        />
-       {user.members[0].username} */}
-
-
-
-
         {user.type === 'DM' ? (
-        <>
-            <img
-            src={user.members[0].image}
-            alt={`${user.members[0].username}'s profile`}
-            />
+          <>
+            <img src={user.members[0].image} alt={`${user.members[0].username}'s profile`} />
             {user.members[0].username}
-        </>
+          </>
         ) : (
-        <>
-            <img
-            src={user.image}
-            alt={`${user.name}'s group pic`}
-            />
+          <>
+            <img src={user.image} alt={`${user.name}'s group pic`} />
             {user.name}
-        </>
+          </>
         )}
-
-
-
-
       </h2>
       <div className="chat-messages">
         {messages.map((message) => (
@@ -127,14 +85,6 @@ function UserChat({ user }) {
         <button onClick={handleSendMessage}>Send</button>
       </div>
     </div>
-
-
-
-
-
-
-
-
   );
 }
 
