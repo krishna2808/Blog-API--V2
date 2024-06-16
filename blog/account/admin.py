@@ -10,7 +10,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ("email", "username", "mobile")
     fields = (
                  "email", "username", "mobile",
-                 "password", "first_name", "last_name","image","groups",
+                 "password", "first_name", "last_name","image", 'bio', "groups",
                  "user_permissions", "is_superuser", "is_staff", 
                  "is_active", "date_joined","last_login", 'is_private_account'
              )

@@ -17,6 +17,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .utils import send_otp_email
 import random
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework_simplejwt.tokens import AccessToken
+
 
 # Create your views here.
 
@@ -171,6 +173,8 @@ class AccountCreateAPI(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = AccountSerializer
 
+# class LoginView(TokenObtainPairView):
+#     pass 
 class LoginView(TokenObtainPairView):
     """
     Custom login view for obtaining JWT tokens.
@@ -196,7 +200,18 @@ class LoginView(TokenObtainPairView):
         This view inherits the behavior of TokenObtainPairView for token generation.
 
     """
-    pass
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        access_token = response.data["access"]
+        user_id   =   AccessToken(access_token)["user_id"]
+        user = User.objects.get(id=user_id)
+        response_data = {
+            'access': access_token,
+            'username': user.username,
+            'id': user.id
+        }
+        return Response(response_data)
 
 
 class ProfileAPI(generics.RetrieveUpdateAPIView):

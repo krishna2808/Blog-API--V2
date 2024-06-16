@@ -19,6 +19,7 @@ from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime , timedelta
 from django.db.models import Q
 from .pagination import CustomLimitOffsetPagination
+from account.serializers import ProfileSerializer
 
 
 from django.http import JsonResponse
@@ -118,12 +119,14 @@ class PostCreateAndListAndUpdateDescostory(APIView):
 
 
 
-class ShowUserPost(APIView):
+class UserProfileAPI(APIView):
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, format=None):
+    def post(self, request, format=None):
+        print("request-data -------- ", request.data )
         username = request.data.get('username')
         user = User.objects.get(username = username)
+        is_same_user = True if request.user.username == username else False
         if user.is_private_account == 1:
             if Friend.objects.filter(current_user = request.user, friend__username = username, friend_request = 1 ).exists():
                 post = Post.objects.filter(user__username = username) 
@@ -131,16 +134,24 @@ class ShowUserPost(APIView):
                 post = Post.objects.none()
         else:
             post = Post.objects.filter(user__username = username)
+        serializer_profile = ProfileSerializer(user)
         serializer = PostSerializer(post, many=True)
         following = list(Friend.objects.order_by('-created_datetime').filter(current_user__username = username, friend_request = 1 ).values_list('friend', flat=True))
         follower = list(Friend.objects.order_by('-created_datetime').filter(friend__username  = username, friend_request = 1 ).values_list('current_user', flat=True))
         friends_context = {
-			'following_friends' : following ,
-			'follower_friends' : follower,
-			'following_count' : len(following),
-			'follower_count' : len(follower)
-		}                 
-        return Response({'user_post' : serializer.data, 'friends_context' : friends_context }, status=status.HTTP_200_OK)
+            'following_friends' : following ,
+            'follower_friends' : follower,
+            'following_count' : len(following),
+            'follower_count' : len(follower),
+            'is_same_user' : is_same_user,
+        
+		}      
+        response_data = {
+            'user_post' : serializer.data, 
+            'friends_context' : friends_context,
+            'user_profile' : serializer_profile.data 
+        }           
+        return Response(response_data ,status=status.HTTP_200_OK)
         
 class CommentAPI(APIView):
     def get_object(self,comment_id):
@@ -195,7 +206,8 @@ class LikeAPI(APIView):
         serializer = LikeSerializer(data=comment_data) 
         if serializer.is_valid():
             serializer.save()
-            post_notification.delay(request.user.id, post_id = serializer.data['post'], type = "liked")
+            # post_notification.delay(request.user.id, post_id = serializer.data['post'], type = "liked")
+            post_notification(request.user.id, post_id = serializer.data['post'], type = "liked")
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -254,3 +266,4 @@ class NotificationAPI(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(receiver = user)
+    

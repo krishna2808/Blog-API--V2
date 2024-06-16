@@ -65,7 +65,13 @@ class User(AbstractUser, PermissionsMixin):
     last_name = models.CharField(max_length=225, null=True, blank=True)
     mobile = models.CharField(max_length=225, null=True, blank=True)
     address = models.CharField(max_length=225, null=True, blank=True)
-    image = models.ImageField(null=True, blank=True, upload_to = f"images/account/{str(datetime.now())}/")
+    bio = models.TextField()  
+    image = models.ImageField(
+        null=True, 
+        blank=True, 
+        upload_to = f"images/account/{str(datetime.now())}/",
+        default='images/default_pic.png'
+    )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)

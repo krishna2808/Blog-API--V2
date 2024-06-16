@@ -42,22 +42,35 @@ def get_user(token):
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         close_old_connections()
-        
+        token = scope['query_string']
         headers = dict(scope["headers"])
-        # print("headers ---------- ", headers)
         token_header = headers.get(b"authorization", None)
-
-        if token_header:
-            try:
-                token_type, token = token_header.decode().split()
-                if token_type.lower() == 'bearer':
-                    scope["user"] = await get_user(token)
-                else:
+        print("token from  header .........", token_header)
+        print("token from query parms......", token)
+    
+        if token_header or token:
+            if token_header:
+                # get token from Header 
+                try:
+                    token_type, token = token_header.decode().split()
+                    if token_type.lower() == 'bearer':
+                        scope["user"] = await get_user(token)
+                    else:
+                        scope["user"] = AnonymousUser()
+                except ValueError:
                     scope["user"] = AnonymousUser()
-            except ValueError:
-                scope["user"] = AnonymousUser()
+            elif token:
+                # get token from url query parms 
+                try:
+                    token = token.decode().split("=")[-1]                    
+                    scope["user"] = await get_user(token)
+                except ValueError:
+                    print("exception ----------- ")
+                    scope["user"] = AnonymousUser()
+            
         else:
             scope["user"] = AnonymousUser()
+            
 
         return await super().__call__(scope, receive, send)
 

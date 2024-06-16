@@ -130,7 +130,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     Fields:
         email (EmailField): The email address associated with the user profile.
         username (CharField): The username for the user profile.
-        mobile (CharField): The mobile number associated with the user profile.
+        mobile (CharField):firstName The mobile number associated with the user profile.
         first_name (CharField): The first name of the user.
         last_name (CharField): The last name of the user.
         address (CharField): The address information of the user.
@@ -157,4 +157,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'mobile', 'first_name', 'last_name', "address","image" ]
+        fields = ['email', 'username', 'mobile', 'first_name', 'last_name', "address","image" , "bio"]

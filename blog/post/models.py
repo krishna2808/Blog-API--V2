@@ -18,6 +18,8 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    class Meta:
+        ordering = ["-created_datetime"]
 
 class Comment(models.Model):
     user = models.ForeignKey(User, related_name='user_comment', on_delete=models.CASCADE)
@@ -28,6 +30,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment[:10]
+    class Meta:
+        ordering = ["-created_datetime"]
 
 class Like(models.Model):
     user = models.ForeignKey(User, related_name='user_like', on_delete=models.CASCADE)
@@ -37,7 +41,9 @@ class Like(models.Model):
     modified_datetime = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return self.comment[:10]
+        return self.like
+    class Meta:
+        ordering = ["-created_datetime"]
     
 class Notification(models.Model):
     notification_content = models.CharField(max_length = 40) 

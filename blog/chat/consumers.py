@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import *
-from .serializers import ChatRoomSerializer
+# from .serializers import ChatRoomSerializer
 from account.models import User
 import json
 
@@ -46,6 +46,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "action": "message",
             "user": userId,
             "roomId": roomId,
+            "sender" : userObj.username,
             "message": message,
             "userImage": userObj.image.url if userObj.image.name else '',
             "userName": userObj.first_name + " " + userObj.last_name if userObj.first_name and userObj.last_name else '',
@@ -68,6 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope['user']
         if self.user.is_authenticated:
             self.userId = self.user.id
+            print("----------  self.userId", self.userId)
             
             self.userRooms = await database_sync_to_async(list)(
             ChatRoom.objects.filter(members=self.userId)

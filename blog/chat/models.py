@@ -1,5 +1,7 @@
 from django.db import models
 from account.models import User
+from datetime import datetime
+
 # Create your models here.
 
 class Message(models.Model):
@@ -22,8 +24,14 @@ from account.models import User
 class ChatRoom(models.Model):
     roomId = ShortUUIDField()
     type = models.CharField(max_length=10, default='DM')
-    members = models.ManyToManyField(User)
+    members = models.ManyToManyField(User, related_name='users_chatroom')
     name = models.CharField(max_length=20, null=True, blank=True)
+    image = models.ImageField(
+        null=True, 
+        blank=True, 
+        upload_to = f"images/account/{str(datetime.now())}/",
+        default='images/group_default.png'
+    )
 
     def __str__(self):
         return self.roomId + ' -> ' + str(self.name)
@@ -36,8 +44,8 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return self.message
-    class Meta:
-        ordering = ["-timestamp"]
+    # class Meta:
+    #     ordering = ["timestamp"]
 
 
 class OnlineUser(models.Model):

@@ -15,3 +15,7 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ("sender", "post", "receiver", "notification_type", "created_datetime")
+    
+@admin.register(Like)
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ("id",)

@@ -4,11 +4,12 @@ from .views import *
 urlpatterns = [
     path('', PostCreateAndListAndUpdateDescostory.as_view(), name="post"),
     path('post-list/', PostList.as_view(), name="post-list"),
-    path('user-post/', ShowUserPost.as_view(), name="user-post"),
+    path('user-profile/', UserProfileAPI.as_view(), name="user-profile"),
     path('post-comment/', CommentAPI.as_view(), name="post-comment"),
     path('post-like/', LikeAPI.as_view(), name="post-like"),
     path('friend-request/', FriendRequestAPI.as_view(), name="friend-request"),
     path('notification/', NotificationAPI.as_view(), name="notification"),
+    # path('user-details/', UserDetailsAPI.as_view(), name="user-details"),
     path('fun/', fun, name="fun"),
     
     # path('own-post/', PostRetrieveAndUpdateAndDestory.as_view(), name="own-post"),
