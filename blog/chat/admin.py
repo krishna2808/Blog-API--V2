@@ -8,3 +8,4 @@ class MessageAdmin(admin.ModelAdmin):
 
 admin.site.register(ChatRoom)
 admin.site.register(ChatMessage)
+admin.site.register(OnlineUser)

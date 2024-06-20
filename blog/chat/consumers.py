@@ -150,6 +150,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
+        print("diconnect user ------------ ",    self.user)
+        
+        await database_sync_to_async(self.deleteOnlineUser)(self.user)
+        await self.sendOnlineUserList()        
+        
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -173,6 +178,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": chatMessage
             }
         )
+
 
     async def chat_message(self, event):
         message = event["message"]
@@ -199,7 +205,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def getOnlineUsers(self):
         onlineUsers = OnlineUser.objects.all()
-        return [onlineUser.user.id for onlineUser in onlineUsers]
+        return [onlineUser.user.username for onlineUser in onlineUsers]
 
     def addOnlineUser(self, user):
         try:

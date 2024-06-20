@@ -5,11 +5,11 @@ function UserChat({ user }) {
   const currentUser = localStorage.getItem('username');
   const [messages, setMessages] = useState(user.chat_room || []);
   const [newMessage, setNewMessage] = useState('');
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const socketRef = useRef(null);
   const [roomId, setRoomId] = useState(user.roomId);
 
   useEffect(() => {
-    debugger
     const token = localStorage.getItem('access_token');
     if (socketRef.current) {
       if (socketRef.current.readyState === WebSocket.OPEN && socketRef.current.roomId === roomId) {
@@ -29,9 +29,12 @@ function UserChat({ user }) {
     };
 
     ws.onmessage = (event) => {
-        debugger
       const newMsg = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, newMsg]);
+      if (newMsg.action === "onlineUser") {
+        setOnlineUsers(newMsg.userList);
+      } else {
+        setMessages((prevMessages) => [...prevMessages, newMsg]);
+      }
     };
 
     ws.onerror = (error) => {
@@ -66,13 +69,19 @@ function UserChat({ user }) {
     setMessages(user.chat_room || []);
   }, [user]);
 
+  const selectedUser = user.type === 'DM' ? user.members[0] : null;
+  const isSelectedUserOnline = selectedUser ? onlineUsers.includes(selectedUser.username) : false;
+
   return (
     <div>
       <h2 className="chat-header">
         {user.type === 'DM' ? (
           <>
-            <img src={user.members[0].image} alt={`${user.members[0].username}'s profile`} />
-            {user.members[0].username}
+            <img src={selectedUser.image} alt={`${selectedUser.username}'s profile`} />
+            {selectedUser.username}
+            <span className={isSelectedUserOnline ? 'status online' : 'status offline'}>
+              {isSelectedUserOnline ? 'Online' : 'Offline'}
+            </span>
           </>
         ) : (
           <>
@@ -81,6 +90,7 @@ function UserChat({ user }) {
           </>
         )}
       </h2>
+
       <div className="chat-messages">
         {messages.map((message) => (
           <div

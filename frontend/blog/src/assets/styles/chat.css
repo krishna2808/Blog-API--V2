@@ -203,3 +203,154 @@
   }
     
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .online-users {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+  
+  .online-users h3 {
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .online-users ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .online-users ul li {
+    padding: 5px 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .status {
+    margin-left: 10px;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+  
+  .online {
+    color: green;
+  }
+  
+  .offline {
+    color: red;
+  }
+  
+  .chat-header {
+    display: flex;
+    align-items: center;
+    /* your existing styles */
+  }
+  
+  .online-users, .offline-users {
+    margin-bottom: 10px;
+  }
+  
+  .chat-messages {
+    /* your existing styles */
+  }
+  
+  .message-input {
+    /* your existing styles */
+  }
+  
+  .chat-message.sent {
+    /* your existing styles for sent messages */
+  }
+  
+  .chat-message.received {
+    /* your existing styles for received messages */
+  }
+  
+  .profile-pic {
+    /* your existing styles for profile pictures */
+  }
+  
