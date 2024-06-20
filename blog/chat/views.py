@@ -105,6 +105,8 @@ class ChatMessageAPI(APIView):
         
 
 
+         
+    
 class SearchChatUser(APIView):
     permission_classes = [IsAuthenticated]
 

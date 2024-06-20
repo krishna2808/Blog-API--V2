@@ -92,7 +92,6 @@ const UserDetails = () => {
             </ul>
 
 
-
           </div> 
         </div>
       </header>

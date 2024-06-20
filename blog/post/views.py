@@ -23,6 +23,8 @@ from account.serializers import ProfileSerializer
 
 
 from django.http import JsonResponse
+from django.db.models import F
+
 
 log = log.getLogger(__name__)
 
@@ -56,7 +58,7 @@ class PostList(generics.ListAPIView):
             
         
     def get_queryset(self):
-        friend_queryset = list(Friend.objects.filter(current_user = self.request.user, friend_request = 1).values("friend"))
+        friend_queryset = list(Friend.objects.filter(current_user = self.request.user, friend_request = 1).values_list("friend", flat=True))
         return Post.objects.select_related("user").filter(Q(user__in = friend_queryset) | Q(user__is_private_account=False))
     
     
@@ -124,26 +126,50 @@ class UserProfileAPI(APIView):
     
     def post(self, request, format=None):
         print("request-data -------- ", request.data )
+        is_friend = True
         username = request.data.get('username')
         user = User.objects.get(username = username)
+        
         is_same_user = True if request.user.username == username else False
         if user.is_private_account == 1:
             if Friend.objects.filter(current_user = request.user, friend__username = username, friend_request = 1 ).exists():
                 post = Post.objects.filter(user__username = username) 
+                post_count = post.count()
+                
             else:
                 post = Post.objects.none()
+                post_count = Post.objects.filter(user__username = username).count() 
+                
+                is_friend = False
         else:
             post = Post.objects.filter(user__username = username)
+            post_count = post.count()
         serializer_profile = ProfileSerializer(user)
         serializer = PostSerializer(post, many=True)
-        following = list(Friend.objects.order_by('-created_datetime').filter(current_user__username = username, friend_request = 1 ).values_list('friend', flat=True))
-        follower = list(Friend.objects.order_by('-created_datetime').filter(friend__username  = username, friend_request = 1 ).values_list('current_user', flat=True))
+        following = list(
+            Friend.objects.select_related("friend", "current_user").order_by('-created_datetime').filter(
+                current_user__username = username, 
+                friend_request = 1 ).values(
+                    username=F('friend__username'),  # Alias friend__username to username
+                    image=F('friend__image')          # Alias friend__image to image
+                    )
+            )
+        follower = list(
+            Friend.objects.select_related("friend", "current_user").order_by('-created_datetime').filter(
+                friend__username  = username, 
+                friend_request = 1 ).values(
+                    username = F('current_user__username'), 
+                    image = F('current_user__image') 
+                    )
+            )
         friends_context = {
             'following_friends' : following ,
             'follower_friends' : follower,
             'following_count' : len(following),
             'follower_count' : len(follower),
             'is_same_user' : is_same_user,
+            'is_friend' : is_friend,
+            'post_count' : post_count
         
 		}      
         response_data = {
@@ -266,4 +292,15 @@ class NotificationAPI(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(receiver = user)
+
+
+class SearchUser(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        
+        query = request.GET.get('query', '')
+        if len(query) >= 3:            
+            users = list(User.objects.filter(username__icontains=query).values("username"))
+            return Response({"data": users})
     

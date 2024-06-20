@@ -15,9 +15,10 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     
     chat_room = serializers.StringRelatedField(source='room.roomId')
     sender = serializers.StringRelatedField(source='sender.username')
+    sender_image = serializers.StringRelatedField(source='sender.image')
     class Meta:
         model = ChatMessage
-        fields = ['id',  'message', 'sender', 'timestamp', 'chat_room']
+        fields = ['id',  'message', 'sender',  'sender_image', 'timestamp', 'chat_room']
 
 
 class MemberSerializer(serializers.Serializer):

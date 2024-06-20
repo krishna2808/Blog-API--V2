@@ -1,22 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/chat.css';
 
 function UserChat({ user }) {
   const currentUser = localStorage.getItem('username');
   const [messages, setMessages] = useState(user.chat_room || []);
   const [newMessage, setNewMessage] = useState('');
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
+  const [roomId, setRoomId] = useState(user.roomId);
 
   useEffect(() => {
+    debugger
     const token = localStorage.getItem('access_token');
-    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/?token=${token}`);
+    if (socketRef.current) {
+      if (socketRef.current.readyState === WebSocket.OPEN && socketRef.current.roomId === roomId) {
+        return;
+      }
+      if (socketRef.current.readyState === WebSocket.OPEN && socketRef.current.roomId !== roomId) {
+        socketRef.current.close();
+      }
+    }
+
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/?token=${token}`);
+    ws.roomId = roomId;
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
-      setSocket(ws);
+      console.log('WebSocket connected to room:', roomId);
+      socketRef.current = ws;
     };
 
     ws.onmessage = (event) => {
+        debugger
       const newMsg = JSON.parse(event.data);
       setMessages((prevMessages) => [...prevMessages, newMsg]);
     };
@@ -26,26 +39,32 @@ function UserChat({ user }) {
     };
 
     ws.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log('WebSocket connection closed for room:', roomId);
+      socketRef.current = null;
     };
 
     return () => {
       if (ws) ws.close();
     };
-  }, []);
+  }, [roomId]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== '' && socket) {
+    if (newMessage.trim() !== '' && socketRef.current) {
       const newMsg = {
         message: newMessage,
         sender: currentUser,
         roomId: user.roomId,
-        action: "message",
+        action: "message"
       };
-      socket.send(JSON.stringify(newMsg));
+      socketRef.current.send(JSON.stringify(newMsg));
       setNewMessage('');
     }
   };
+
+  useEffect(() => {
+    setRoomId(user.roomId);
+    setMessages(user.chat_room || []);
+  }, [user]);
 
   return (
     <div>
@@ -68,10 +87,20 @@ function UserChat({ user }) {
             key={message.id}
             className={`chat-message ${message.sender === currentUser ? 'sent' : 'received'}`}
           >
-            <div>
-              <strong>{message.sender}</strong> <span>({message.timestamp})</span>
+            <div className="message-header">
+              <img 
+                src={`http://localhost:8000/media/${message.sender_image}`} 
+                alt={`${message.sender}'s profile`} 
+                className="profile-pic"
+              />
+              <div className="message-content">
+                {user.type !== 'DM' && <strong>{message.sender}</strong>}
+                <div className="message-text">{message.message}</div>
+              </div>
+              <div className="message-timestamp">
+                <span>({message.timestamp})</span>
+              </div>
             </div>
-            <div>{message.message}</div>
           </div>
         ))}
       </div>

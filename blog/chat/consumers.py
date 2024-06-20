@@ -12,120 +12,214 @@ import json
 
 
 
+# class ChatConsumer(AsyncWebsocketConsumer):
+#     # def getUser(self, userId):
+#     #     return User.objects.get(id=userId)
+
+#     # def getOnlineUsers(self):
+#     #     onlineUsers = OnlineUser.objects.all()
+#     #     return [onlineUser.user.id for onlineUser in onlineUsers]
+
+#     # def addOnlineUser(self, user):
+#     #     try:
+#     #         OnlineUser.objects.create(user=user)
+#     #     except:
+#     #         pass
+
+#     # def deleteOnlineUser(self, user):
+#     #     try:
+#     #         OnlineUser.objects.get(user=user).delete()
+#     #     except:
+#     #         pass
+
+#     def load_old_message(self, id):
+#         pass 
+
+#     def saveMessage(self, message, userId, roomId):
+#         userObj = User.objects.get(id=userId)
+#         chatObj = ChatRoom.objects.get(roomId=roomId)
+#         chatMessageObj = ChatMessage.objects.create(
+#             room=chatObj, sender=userObj, message=message
+#         )
+#         print("........... save message ")
+#         return {
+#             "action": "message",
+#             "user": userId,
+#             "roomId": roomId,
+#             "sender" : userObj.username,
+#             "message": message,
+#             "userImage": userObj.image.url if userObj.image.name else '',
+#             "userName": userObj.first_name + " " + userObj.last_name if userObj.first_name and userObj.last_name else '',
+#             "timestamp": str(chatMessageObj.timestamp),
+#         }
+
+#     # async def sendOnlineUserList(self):
+#     #     onlineUserList = await database_sync_to_async(self.getOnlineUsers)()
+#     #     chatMessage = {
+#     #         "type": "chat_message",
+#     #         "message": {"action": "onlineUser", "userList": onlineUserList},
+#     #     }
+#     #     await self.channel_layer.group_send("onlineUser", chatMessage)
+
+
+
+
+#     async def connect(self):
+#         print("............ connect socket ")
+#         self.user = self.scope['user']
+#         if self.user.is_authenticated:
+#             self.userId = self.user.id
+#             print("----------  self.userId", self.userId)
+            
+#             self.userRooms = await database_sync_to_async(list)(
+#             ChatRoom.objects.filter(members=self.userId)
+#             )
+#             for room in self.userRooms:
+#                 await self.channel_layer.group_add(room.roomId, self.channel_name)
+
+#             # await self.channel_layer.group_add("onlineUser", self.channel_name)
+#             # self.user = await database_sync_to_async(self.getUser)(self.userId)
+#             # await database_sync_to_async(self.addOnlineUser)(self.user)
+#             # await self.sendOnlineUserList()
+#             await self.accept()
+#         else:
+#             await self.close()
+
+
+#     async def disconnect(self, close_code):
+#         # await database_sync_to_async(self.deleteOnlineUser)(self.user)
+#         # await self.sendOnlineUserList()
+#         for room in self.userRooms:
+#             await self.channel_layer.group_discard(room.roomId, self.channel_name)
+
+#     async def receive(self, text_data):
+#         text_data_json = json.loads(text_data)
+#         action = text_data_json["action"]
+#         roomId = text_data_json["roomId"]
+#         print("roomId ------- ", roomId)
+#         chatMessage = {}
+#         if action == "message":
+#             message = text_data_json["message"]
+#             # userId = text_data_json["user"]
+#             chatMessage = await database_sync_to_async(self.saveMessage)(
+#                 # message, userId, roomId
+#                 message, self.userId, roomId
+#             )
+#         elif action == "typing":
+#             chatMessage = text_data_json
+        
+#         await self.channel_layer.group_send(
+#             roomId , {"type": "chat_message", "message": chatMessage}
+#         )
+        
+
+
+#     async def chat_message(self, event):
+#         message = event["message"]
+#         await self.send(text_data=json.dumps(message))
+        
+
+
 class ChatConsumer(AsyncWebsocketConsumer):
-    # def getUser(self, userId):
-    #     return User.objects.get(id=userId)
+    async def connect(self):
+        self.user = self.scope['user']
+        if self.user.is_authenticated:
+            self.userId = self.user.id
+            self.room_id = self.scope['url_route']['kwargs']['room_id']
+            self.room_group_name = f'chat_{self.room_id}'
 
-    # def getOnlineUsers(self):
-    #     onlineUsers = OnlineUser.objects.all()
-    #     return [onlineUser.user.id for onlineUser in onlineUsers]
+            # Join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            
+            
+            
+            
+            await self.channel_layer.group_add("onlineUser", self.channel_name)
+           
+            await database_sync_to_async(self.addOnlineUser)(self.user)
+            await self.sendOnlineUserList()            
+            
+            
+            
 
-    # def addOnlineUser(self, user):
-    #     try:
-    #         OnlineUser.objects.create(user=user)
-    #     except:
-    #         pass
+            await self.accept()
+        else:
+            await self.close()
 
-    # def deleteOnlineUser(self, user):
-    #     try:
-    #         OnlineUser.objects.get(user=user).delete()
-    #     except:
-    #         pass
+    async def disconnect(self, close_code):
+        # Leave room group
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
 
-    def load_old_message(self, id):
-        pass 
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        sender_id = self.userId
+        room_id = text_data_json['roomId']
 
-    def saveMessage(self, message, userId, roomId):
+        # Save message to database
+        chatMessage = await self.save_message(message, sender_id, room_id)
+
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "chat_message",
+                "message": chatMessage
+            }
+        )
+
+    async def chat_message(self, event):
+        message = event["message"]
+        await self.send(text_data=json.dumps(message))
+
+    @database_sync_to_async
+    def save_message(self, message, userId, roomId):
         userObj = User.objects.get(id=userId)
         chatObj = ChatRoom.objects.get(roomId=roomId)
         chatMessageObj = ChatMessage.objects.create(
             room=chatObj, sender=userObj, message=message
         )
-        print("........... save message ")
         return {
             "action": "message",
             "user": userId,
             "roomId": roomId,
-            "sender" : userObj.username,
+            "sender": userObj.username,
             "message": message,
-            "userImage": userObj.image.url if userObj.image.name else '',
+            "sender_image": userObj.image.name if userObj.image.name else '',
             "userName": userObj.first_name + " " + userObj.last_name if userObj.first_name and userObj.last_name else '',
             "timestamp": str(chatMessageObj.timestamp),
         }
 
-    # async def sendOnlineUserList(self):
-    #     onlineUserList = await database_sync_to_async(self.getOnlineUsers)()
-    #     chatMessage = {
-    #         "type": "chat_message",
-    #         "message": {"action": "onlineUser", "userList": onlineUserList},
-    #     }
-    #     await self.channel_layer.group_send("onlineUser", chatMessage)
 
+    def getOnlineUsers(self):
+        onlineUsers = OnlineUser.objects.all()
+        return [onlineUser.user.id for onlineUser in onlineUsers]
 
+    def addOnlineUser(self, user):
+        try:
+            OnlineUser.objects.create(user=user)
+        except:
+            pass
 
-
-    async def connect(self):
-        print("............ connect socket ")
-        self.user = self.scope['user']
-        if self.user.is_authenticated:
-            self.userId = self.user.id
-            print("----------  self.userId", self.userId)
-            
-            self.userRooms = await database_sync_to_async(list)(
-            ChatRoom.objects.filter(members=self.userId)
-            )
-            for room in self.userRooms:
-                await self.channel_layer.group_add(room.roomId, self.channel_name)
-
-            # await self.channel_layer.group_add("onlineUser", self.channel_name)
-            # self.user = await database_sync_to_async(self.getUser)(self.userId)
-            # await database_sync_to_async(self.addOnlineUser)(self.user)
-            # await self.sendOnlineUserList()
-            await self.accept()
-        else:
-            await self.close()
-
-
-    async def disconnect(self, close_code):
-        # await database_sync_to_async(self.deleteOnlineUser)(self.user)
-        # await self.sendOnlineUserList()
-        for room in self.userRooms:
-            await self.channel_layer.group_discard(room.roomId, self.channel_name)
-
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        action = text_data_json["action"]
-        roomId = text_data_json["roomId"]
-        print("roomId ------- ", roomId)
-        chatMessage = {}
-        if action == "message":
-            message = text_data_json["message"]
-            # userId = text_data_json["user"]
-            chatMessage = await database_sync_to_async(self.saveMessage)(
-                # message, userId, roomId
-                message, self.userId, roomId
-            )
-        elif action == "typing":
-            chatMessage = text_data_json
+    def deleteOnlineUser(self, user):
+        try:
+            OnlineUser.objects.get(user=user).delete()
+        except:
+            pass
         
-        await self.channel_layer.group_send(
-            roomId, {"type": "chat_message", "message": chatMessage}
-        )
-        
-
-
-    async def chat_message(self, event):
-        message = event["message"]
-        await self.send(text_data=json.dumps(message))
-        
-
-
-
-
-
-
-
-
+    async def sendOnlineUserList(self):
+        onlineUserList = await database_sync_to_async(self.getOnlineUsers)()
+        chatMessage = {
+            "type": "chat_message",
+            "message": {"action": "onlineUser", "userList": onlineUserList},
+        }
+        await self.channel_layer.group_send("onlineUser", chatMessage)
 
 
 

@@ -9,6 +9,8 @@ urlpatterns = [
     path('post-like/', LikeAPI.as_view(), name="post-like"),
     path('friend-request/', FriendRequestAPI.as_view(), name="friend-request"),
     path('notification/', NotificationAPI.as_view(), name="notification"),
+    path('search_user/', SearchUser.as_view(), name = 'search_user'),
+    
     # path('user-details/', UserDetailsAPI.as_view(), name="user-details"),
     path('fun/', fun, name="fun"),
     

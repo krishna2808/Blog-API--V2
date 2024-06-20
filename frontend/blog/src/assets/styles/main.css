@@ -66,11 +66,7 @@
 
 /* dashboard  */
   
-  .instagram-dashboard {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-  }
+
   
   .post {
     margin-bottom: 20px;
@@ -145,6 +141,157 @@
     margin-top: 10px;
   }
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* main.css */
+
+.instagram-dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .post {
+    width: 500px;
+    border: 1px solid #dbdbdb;
+    background-color: #fff;
+    margin-bottom: 20px;
+    border-radius: 3px;
+  }
+  
+  .post-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #dbdbdb;
+  }
+  
+  .user-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .post-username {
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .post-title,
+  .post-description,
+  .post-created-datetime {
+    padding: 10px;
+  }
+  
+  .post-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .post-details {
+    padding: 10px;
+  }
+  
+  .post-likes,
+  .post-comments {
+    margin-bottom: 10px;
+  }
+  
+  .liked-users {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .liked-user {
+    display: flex;
+    align-items: center;
+  }
+  
+  .liked-user img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  
+  .like-button,
+  .comment-form button {
+    background-color: #3897f0;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .comment-form {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #dbdbdb;
+  }
+  
+  .comment-form input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #dbdbdb;
+    border-radius: 3px;
+  }
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
 /* blog profile  */
 
