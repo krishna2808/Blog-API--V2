@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import SignIn from './SignIn';
 
 function Logout(){
@@ -7,13 +6,10 @@ function Logout(){
     var username = localStorage.removeItem('username');
     var user_id = localStorage.removeItem('user_id');
     var login_user_image = localStorage.removeItem('login_user_image');
-    // if(token != null || ){
-        // localStorage.removeItem('access_token');
+
         return(
             <SignIn/>
         );
-    // }
-
 
 }
 export default Logout;

@@ -3,6 +3,9 @@ import axios from 'axios';
 import '../../assets/styles/main.css';
 import Header from '../common/Header';
 
+const profileUrl = `${process.env.REACT_APP_BACKEND_API_URL}/account/profile/`
+
+
 function Profile() {
     const [user, setUser] = useState({
         profilePic: '',
@@ -23,7 +26,7 @@ function Profile() {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8000/account/profile/', { headers: header })
+        axios.get(profileUrl, { headers: header })
             .then(response => {
                 const data = response.data;
                 console.log("User data fetched: ", data);
@@ -73,7 +76,7 @@ function Profile() {
         formData.append('bio', user.bio);
         formData.append('is_private_account', user.isPrivateAccount);
 
-        axios.put('http://localhost:8000/account/profile/', formData, {
+        axios.put(profileUrl, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`,
@@ -90,7 +93,8 @@ function Profile() {
     return (
         <>
             <Header />
-            <div class="create-post-container">                <div className="profile-container">
+            <div class="create-post-container">               
+             <div className="profile-container">
                     <h1>Profile</h1>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">

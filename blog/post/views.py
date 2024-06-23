@@ -345,6 +345,7 @@ class SearchUser(APIView):
         if len(query) >= 3:            
             users = list(User.objects.filter(username__icontains=query).values("username"))
             return Response({"data": users})
+        return Response({"data": ''})
     
 
 

@@ -4,6 +4,11 @@ import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../assets/styles/chat.css';
 
+
+const chatMessageGetCreateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/chat_message/`;
+const searchChatUserUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/search_chat_user`;
+
+
 function UserChatList({ onSelect }) {
   const [chats, setChats] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -17,7 +22,6 @@ function UserChatList({ onSelect }) {
   const [pinnedChats, setPinnedChats] = useState([]);
 
   const token = localStorage.getItem('access_token');
-  const url = "http://localhost:8000/chat/chat_message/";
   const header = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
@@ -25,20 +29,20 @@ function UserChatList({ onSelect }) {
 
   useEffect(() => {
     if (searchQuery.length >= 3) {
-      axios.get(`http://localhost:8000/chat/search_chat_user?query=${searchQuery}`, { headers: header })
+      axios.get(`${searchChatUserUrl}?query=${searchQuery}`, { headers: header })
         .then(response => setSearchResults(response.data.data))
         .catch(error => console.error('Error fetching usernames:', error));
     }
   }, [searchQuery]);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/chat/search_chat_user`, { headers: header })
+    axios.get(searchChatUserUrl, { headers: header })
       .then(response => setUserList(response.data.data))
       .catch(error => console.error('Error fetching usernames:', error));
   }, [showNewGroupChatModal]);
 
   useEffect(() => {
-    fetch(url, {
+    fetch(chatMessageGetCreateDeleteUrl, {
       method: 'GET',
       headers: header
     })
@@ -52,7 +56,7 @@ function UserChatList({ onSelect }) {
 
   const chatNewUser = (username) => {
     const payload = { usernames: [username], type: "DM" };
-    axios.post(url, payload, { headers: header })
+    axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
       .then(response => {
         setSearchResults(response.data.data);
         window.location.reload();
@@ -63,7 +67,7 @@ function UserChatList({ onSelect }) {
   const handleGroupAdd = () => {
     if (selectedGroupUsers.length > 0 && groupName.length > 0) {
       const payload = { usernames: selectedGroupUsers, name: groupName, type: "GROUP" };
-      axios.post(url, payload, { headers: header })
+      axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
         .then(response => {
           setSearchResults(response.data.data);
           window.location.reload();
@@ -76,7 +80,7 @@ function UserChatList({ onSelect }) {
     var payload = {
         "chat_room_id": chatId
     }
-    axios.delete(`http://localhost:8000/chat/chat_message`, {
+    axios.delete(chatMessageGetCreateDeleteUrl, {
        headers: header,
        data: payload
     })

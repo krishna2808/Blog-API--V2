@@ -28,7 +28,7 @@ const Popup = ({ title, items, onClose }) => {
           <ul>
             {items.map((item, index) => (
               <li key={index} onClick={() => handleUserClick(item.username)}>
-                <img src={`http://localhost:8000/media/${item.image}`} alt={`${item.username}'s profile`} />
+                <img src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${item.image}`} alt={`${item.username}'s profile`} />
                 <span>{item.username}</span>
               </li>
             ))}

@@ -4,6 +4,9 @@ import axios from 'axios';
 import '../../assets/styles/network.css';
 import Header from '../common/Header';
 
+
+const friendRequestGetUpdateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/friend-request/`
+
 const MyNetwork = () => {
   const [requestedUsers, setRequestedUsers] = useState([]);
   const token = localStorage.getItem('access_token');
@@ -14,7 +17,7 @@ const MyNetwork = () => {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/post/friend-request/`, { headers: header })
+    axios.get(friendRequestGetUpdateDeleteUrl, { headers: header })
       .then(response => {
         setRequestedUsers(response.data);
       })
@@ -28,7 +31,7 @@ const MyNetwork = () => {
         "accept_friend_request_username": username,
         "friend_request" : 1
     }
-    axios.put(`http://localhost:8000/post/friend-request/`, 
+    axios.put(friendRequestGetUpdateDeleteUrl, 
        payload, 
        { headers: header }
     )
@@ -46,7 +49,7 @@ const MyNetwork = () => {
         "cancel_friend_request_username": username,
         "action" : "cancel_friend_request"
     }
-    axios.delete(`http://localhost:8000/post/friend-request/`,
+    axios.delete(friendRequestGetUpdateDeleteUrl,
     {
         headers: header,
         data: payload
@@ -77,7 +80,7 @@ const MyNetwork = () => {
             {requestedUsers.map(user => (
               <div className="network-item" key={user.current_user_username}>
                 <div className="network-profile" onClick={() => handleProfileRedirect(user.current_user_username)}>
-                  <img src={`http://localhost:8000/media/${user.friend_image}`} alt={`${user.current_user_username}'s profile`} className="network-profile-pic" />
+                  <img src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${user.friend_image}`} alt={`${user.current_user_username}'s profile`} className="network-profile-pic" />
                   <span className="network-username">{user.current_user_username}</span>
                 </div>
                 <div className="network-buttons">

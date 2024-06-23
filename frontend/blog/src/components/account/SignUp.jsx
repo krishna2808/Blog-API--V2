@@ -8,7 +8,8 @@ import '../../assets/styles/main.css'
 
 // import { useHistory } from 'react-router-dom';
 
-const signUpUrl = "http://0.0.0.0:8000/account/signup/"
+const signUpUrl = `${process.env.REACT_APP_BACKEND_API_URL}/account/signup/`
+
 
 
 function SignUp() {

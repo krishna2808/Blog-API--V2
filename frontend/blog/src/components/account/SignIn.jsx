@@ -8,8 +8,7 @@ import {Link} from "react-router-dom";
 import { BLOG_API_URL } from '../../config';
 import Dashboard from '../post/Dashboard';
 
-// const signInUrl = BLOG_API_URL +"/account/signin/"
-const signInUrl = "http://0.0.0.0:8000/account/signin/"
+const signInUrl = `${process.env.REACT_APP_BACKEND_API_URL}/account/signin/`
 
 
 function SignIn() {
@@ -101,14 +100,14 @@ function SignIn() {
 				    onChange={(e) => setPassword(e.target.value)}
 			    ></input>
 			</div>
-			<div className="mb-3 form-check">
+			{/* <div className="mb-3 form-check">
 				<input 
 				    type="checkbox"
 				    className="form-check-input" 
 					id="exampleCheck1"
 			    ></input>
 				<label className="form-check-label label-text" htmlFor="exampleCheck1">Check me out</label>
-			</div>
+			</div> */}
 			<div>
 			<Link to="/forgot-password" > Forgot-password</Link> <br></br> <br></br>
 

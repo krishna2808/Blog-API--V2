@@ -5,6 +5,11 @@ import '../../assets/styles/main.css';
 import Header from '../common/Header';
 import Popup from './Popup'; // Import the Popup component
 
+const friendRequestGetUpdateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/friend-request/`
+const userProfileUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/user-profile/`
+const postDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`
+
+
 const UserDetails = () => {
   const { username } = useParams();
   const location = useLocation();
@@ -20,7 +25,7 @@ const UserDetails = () => {
   };
 
   useEffect(() => {
-    axios.post(`http://localhost:8000/post/user-profile/`, { username: profile_username }, { headers: header })
+    axios.post(userProfileUrl, { username: profile_username }, { headers: header })
       .then(response => {
         setUserDetails(response.data);
       })
@@ -64,7 +69,7 @@ const UserDetails = () => {
     var payload = {
       "post_id" : postId
     }
-    axios.delete(`http://localhost:8000/post/`, {
+    axios.delete(postDeleteUrl, {
         headers: header,
         data: payload
     })
@@ -85,7 +90,7 @@ const UserDetails = () => {
     var payload = {
         "friend_request_username": profile_username
     }
-    axios.post(`http://localhost:8000/post/friend-request/`, 
+    axios.post(friendRequestGetUpdateDeleteUrl , 
         payload, 
         { headers: header }
     )
@@ -111,7 +116,7 @@ const UserDetails = () => {
         "friend_unfollow_username" : userDetails.user_profile.username,
         "action" : "unfollow_friend"
     }
-    axios.delete(`http://localhost:8000/post/friend-request/`, {
+    axios.delete(friendRequestGetUpdateDeleteUrl, {
        headers: header,
        data: payload
     })
@@ -137,7 +142,7 @@ const UserDetails = () => {
       <header className="profile-header">
         <div className="profile">
           <div className="profile-image">
-            <img src={`http://localhost:8000${userDetails.user_profile.image}`} alt={`${userDetails.user_profile.username}'s profile`} />
+            <img src={`${process.env.REACT_APP_BACKEND_API_URL}${userDetails.user_profile.image}`} alt={`${userDetails.user_profile.username}'s profile`} />
           </div>
           <div className="profile-user-settings">
             <h1 className="profile-user-name">{userDetails.user_profile.username}</h1>
@@ -177,7 +182,7 @@ const UserDetails = () => {
         <div className="gallery">
           {userDetails.user_post.map(post => (
             <div className="gallery-item" key={post.id} tabIndex="0">
-              <img src={`http://localhost:8000${post.file}`} className="gallery-image" alt={post.title} />
+              <img src={`${process.env.REACT_APP_BACKEND_API_URL}${post.file}`} className="gallery-image" alt={post.title} />
               <div className="gallery-item-info">
                 <ul>
                   <li className="gallery-item-likes">

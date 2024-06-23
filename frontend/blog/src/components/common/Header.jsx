@@ -3,6 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../../assets/styles/header.css';
 import axios from 'axios';
 
+
+const totalFriendRequestUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/total-friend-request/`
+const searchUserUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/search_user`
+
+
 function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -18,7 +23,7 @@ function Header() {
 
     useEffect(() => {
         // Fetch the count of friend requests
-        axios.get('http://localhost:8000/post/total-friend-request/', { headers: header })
+        axios.get(totalFriendRequestUrl, { headers: header })
             .then(response => {
                 setFriendRequestCount(response.data.total_friend_request);
             })
@@ -32,7 +37,7 @@ function Header() {
         setSearchQuery(query);
 
         if (query.length >= 2) {
-            axios.get(`http://localhost:8000/post/search_user?query=${query}`, { headers: header })
+            axios.get(`${searchUserUrl}?query=${query}`, { headers: header })
                 .then(response => setSearchResults(response.data.data))
                 .catch(error => console.error('Error fetching usernames:', error));
         } else {
@@ -104,7 +109,7 @@ function Header() {
                             <li className="nav-item">
                                 <Link className="nav-link" to="/profile">
                                     <img 
-                                        src={login_user_image ? `http://localhost:8000/media/${login_user_image}` : "profile.png"} 
+                                        src={login_user_image ? `${process.env.REACT_APP_BACKEND_API_URL}/media/${login_user_image}` : "profile.png"} 
                                         className="header-image circular-image" 
                                         alt="Profile" 
                                     />

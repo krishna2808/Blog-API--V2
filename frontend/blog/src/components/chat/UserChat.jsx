@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/chat.css';
 
+
+const websocketUrl = `${process.env.REACT_APP_BACKEND_WS_URL}/ws/chat`;
+
+
 function UserChat({ user }) {
   const currentUser = localStorage.getItem('username');
   const [messages, setMessages] = useState(user.chat_room || []);
@@ -23,7 +27,7 @@ function UserChat({ user }) {
       }
     }
 
-    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/?token=${token}`);
+    const ws = new WebSocket(`${websocketUrl}/${roomId}/?token=${token}`);
     ws.roomId = roomId;
 
     ws.onopen = () => {
@@ -190,7 +194,7 @@ function UserChat({ user }) {
           >
             <div className="message-header">
               <img 
-                src={`http://localhost:8000/media/${message.sender_image}`} 
+                src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${message.sender_image}`} 
                 alt={`${message.sender}'s profile`} 
                 className="profile-pic"
               />

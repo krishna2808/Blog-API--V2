@@ -3,6 +3,9 @@ import '../../assets/styles/main.css';
 import axios from 'axios';
 import Header from '../common/Header';
 
+const postCreateAndListAndUpdateDescostoryUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`
+
+
 function CreatePost() {
     const [post, setPost] = useState({
         title: '',
@@ -33,7 +36,7 @@ function CreatePost() {
         formData.append('description', post.description);
         formData.append('file', post.image);
 
-        axios.post('http://localhost:8000/post/', formData, { headers: header })
+        axios.post(postCreateAndListAndUpdateDescostoryUrl, formData, { headers: header })
             .then(response => {
                 console.log('Post created successfully!', response.data);
                 setPost({
@@ -49,9 +52,6 @@ function CreatePost() {
 
     return (
         <>
-
-
-
 
             <Header/>
             <div className="create-post-container">
@@ -73,9 +73,6 @@ function CreatePost() {
                 </form>
             </div>
 
-
-        
-        
         </>
         
     );
