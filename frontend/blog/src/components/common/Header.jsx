@@ -1,51 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../../assets/styles/header.css';
 import axios from 'axios';
 
-
-
 function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [friendRequestCount, setFriendRequestCount] = useState(0);
     const navigate = useNavigate();
     const token = localStorage.getItem('access_token');
+    const login_user_image = localStorage.getItem('login_user_image');
+
     const header = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
     };
+
+    useEffect(() => {
+        // Fetch the count of friend requests
+        axios.get('http://localhost:8000/post/total-friend-request/', { headers: header })
+            .then(response => {
+                setFriendRequestCount(response.data.total_friend_request);
+            })
+            .catch(error => {
+                console.error('Error fetching friend request count:', error);
+            });
+    }, []);
 
     const handleSearchChange = async (e) => {
         const query = e.target.value;
         setSearchQuery(query);
 
         if (query.length >= 2) {
-            // Simulate an AJAX request to fetch usernames
-            // const response = await fetch(`http://localhost:8000/chat/search_user/?q=${query}`);
-            // const data = await response.json();
-            axios.get(`http://localhost:8000/post/search_user?query=${searchQuery}`, { headers: header })
-            .then(response => setSearchResults(response.data.data))
-            .catch(error => console.error('Error fetching usernames:', error));
-            // setSearchResults(data);
+            axios.get(`http://localhost:8000/post/search_user?query=${query}`, { headers: header })
+                .then(response => setSearchResults(response.data.data))
+                .catch(error => console.error('Error fetching usernames:', error));
         } else {
             setSearchResults([]);
         }
     };
 
-
-
-
-
-
     const handleResultClick = (username) => {
         setSearchQuery('');
         setSearchResults([]);
         localStorage.setItem('profile_username', username);
-
         navigate(`/user-profile/?username=${username}`);
         window.location.reload();
-
-
     };
 
     return (
@@ -54,7 +54,7 @@ function Header() {
                 <div className="container-fluid">
                     <Link className="navbar-brand" to="/dashboard">Home</Link>
                     <Link className="navbar-brand" to="/create-post">
-                        <img src="add_post.png" className="chat-default" alt="add-post" />
+                        <img src="add_post.png" className="header-image" alt="add-post" />
                     </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
@@ -89,12 +89,24 @@ function Header() {
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/chat">
-                                    <img src="message_logo.jpeg" className="chat-default" alt="Chat" />
+                                    <img src="message_logo.jpeg" className="header-image" alt="Chat" />
+                                </Link>
+                            </li>
+                            <li className="nav-item position-relative">
+                                <Link className="nav-link" to="/my-network">
+                                    <img src="network_logo.png" className="header-image" alt="network" />
+                                    {friendRequestCount > 0 && (
+                                        <span className="friend-request-count">{friendRequestCount}</span>
+                                    )}
                                 </Link>
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/profile">
-                                    <img src="profile.png" className="chat-default" alt="Profile" />
+                                    <img 
+                                        src={login_user_image ? `http://localhost:8000/media/${login_user_image}` : "profile.png"} 
+                                        className="header-image" 
+                                        alt="Profile" 
+                                    />
                                 </Link>
                             </li>
                         </ul>

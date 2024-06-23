@@ -8,6 +8,7 @@ urlpatterns = [
     path('post-comment/', CommentAPI.as_view(), name="post-comment"),
     path('post-like/', LikeAPI.as_view(), name="post-like"),
     path('friend-request/', FriendRequestAPI.as_view(), name="friend-request"),
+    path('total-friend-request/', total_friend_request, name="total-friend-request"),
     path('notification/', NotificationAPI.as_view(), name="notification"),
     path('search_user/', SearchUser.as_view(), name = 'search_user'),
     

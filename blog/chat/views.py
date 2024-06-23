@@ -95,6 +95,7 @@ class ChatMessageAPI(APIView):
     def delete(self, request, format=None):
         try:
             chat_room_id = request.data.get("chat_room_id")
+            print("chat_room_id ------ ", chat_room_id)
             if not chat_room_id:
                 return Response({"error": "Usernames list is required"}, status=status.HTTP_400_BAD_REQUEST)
             chat_room_id = chat_room_id

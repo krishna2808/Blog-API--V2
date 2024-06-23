@@ -3,7 +3,6 @@ import axios from 'axios';
 import '../../assets/styles/main.css';
 import Header from '../common/Header';
 
-
 function Profile() {
     const [user, setUser] = useState({
         profilePic: '',
@@ -14,6 +13,7 @@ function Profile() {
         mobile: '',
         address: '',
         bio: '',
+        isPrivateAccount: false,
     });
 
     const token = localStorage.getItem('access_token');
@@ -26,6 +26,7 @@ function Profile() {
         axios.get('http://localhost:8000/account/profile/', { headers: header })
             .then(response => {
                 const data = response.data;
+                console.log("User data fetched: ", data);
                 setUser({
                     profilePic: data.image || '',
                     firstName: data.first_name || '',
@@ -35,6 +36,7 @@ function Profile() {
                     mobile: data.mobile || '',
                     address: data.address || '',
                     bio: data.bio || '',
+                    isPrivateAccount: data.is_private_account || false,
                 });
             })
             .catch(error => {
@@ -44,7 +46,11 @@ function Profile() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUser({ ...user, [name]: value });
+        if (name === "isPrivateAccount") {
+            setUser({ ...user, [name]: value === "yes" });
+        } else {
+            setUser({ ...user, [name]: value });
+        }
     };
 
     const handleProfilePicChange = (e) => {
@@ -55,7 +61,9 @@ function Profile() {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('image', user.profilePic);
+        if (user.profilePic && user.profilePic instanceof File) {
+            formData.append('image', user.profilePic);
+        }
         formData.append('first_name', user.firstName);
         formData.append('last_name', user.lastName);
         formData.append('username', user.username);
@@ -63,6 +71,7 @@ function Profile() {
         formData.append('mobile', user.mobile);
         formData.append('address', user.address);
         formData.append('bio', user.bio);
+        formData.append('is_private_account', user.isPrivateAccount);
 
         axios.put('http://localhost:8000/account/profile/', formData, {
             headers: {
@@ -71,7 +80,7 @@ function Profile() {
             }
         })
             .then(response => {
-                console.log('Profile updated successfully!');
+                console.log('Profile updated successfully!', response.data);
             })
             .catch(error => {
                 console.error('Error updating profile:', error);
@@ -80,53 +89,67 @@ function Profile() {
 
     return (
         <>
-            <Header/>
+            <Header />
+            <div class="create-post-container">                <div className="profile-container">
+                    <h1>Profile</h1>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="profilePic" className="form-label">Profile Picture</label>
+                            <input type="file" className="form-control" id="profilePic" name="profilePic" onChange={handleProfilePicChange} />
+                            {user.profilePic && (
+                                <img
+                                    src={typeof user.profilePic === 'string' ? user.profilePic : URL.createObjectURL(user.profilePic)}
+                                    alt="Profile"
+                                    className="profile-pic"
+                                />
+                            )}
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="firstName" className="form-label">First Name</label>
+                            <input type="text" className="form-control" id="firstName" name="firstName" value={user.firstName} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="lastName" className="form-label">Last Name</label>
+                            <input type="text" className="form-control" id="lastName" name="lastName" value={user.lastName} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="username" className="form-label">Username</label>
+                            <input type="text" className="form-control" id="username" name="username" value={user.username} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input type="email" className="form-control" id="email" name="email" value={user.email} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="mobile" className="form-label">Mobile</label>
+                            <input type="text" className="form-control" id="mobile" name="mobile" value={user.mobile} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="address" className="form-label">Address</label>
+                            <input type="text" className="form-control" id="address" name="address" value={user.address} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="bio" className="form-label">Bio</label>
+                            <textarea className="form-control" id="bio" name="bio" value={user.bio} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="isPrivateAccount" className="form-label">Private Account</label>
+                            <select className="form-control" id="isPrivateAccount" name="isPrivateAccount" value={user.isPrivateAccount ? "yes" : "no"} onChange={handleChange}>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <button type="submit" className="btn-primary">Submit</button>
+                    </form>
+                </div>
 
-            <div className="profile-container">
-            <h1>Profile</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="profilePic" className="form-label">Profile Picture</label>
-                    <input type="file" className="form-control" id="profilePic" name="profilePic" onChange={handleProfilePicChange} />
-                    {user.profilePic && <img src={typeof user.profilePic === 'string' ? user.profilePic : URL.createObjectURL(user.profilePic)} alt="Profile" className="profile-pic" />}
-                </div>
-                <div className="form-group">
-                    <label htmlFor="firstName" className="form-label">First Name</label>
-                    <input type="text" className="form-control" id="firstName" name="firstName" value={user.firstName} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="lastName" className="form-label">Last Name</label>
-                    <input type="text" className="form-control" id="lastName" name="lastName" value={user.lastName} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input type="text" className="form-control" id="username" name="username" value={user.username} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="email" className="form-label">Email</label>
-                    <input type="email" className="form-control" id="email" name="email" value={user.email} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="mobile" className="form-label">Mobile</label>
-                    <input type="text" className="form-control" id="mobile" name="mobile" value={user.mobile} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="address" className="form-label">Address</label>
-                    <input type="text" className="form-control" id="address" name="address" value={user.address} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="bio" className="form-label">Bio</label>
-                    <textarea className="form-control" id="bio" name="bio" value={user.bio} onChange={handleChange} />
-                </div>
-                <button type="submit" className="btn-primary">Submit</button>
-            </form>
-        </div>
+        
 
 
+            </div>
 
-
+    
         </>
-
     );
 }
 

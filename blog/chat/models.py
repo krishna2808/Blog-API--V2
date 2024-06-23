@@ -39,7 +39,9 @@ class ChatRoom(models.Model):
 class ChatMessage(models.Model):
     room = models.ForeignKey(ChatRoom, on_delete=models.SET_NULL, null=True, related_name='chat_room')
     sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='user_chat')
+    file = models.FileField(upload_to='chat_files/', null=True, blank=True)
     message = models.CharField(max_length=255)
+    
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

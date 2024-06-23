@@ -11,6 +11,7 @@ import Dashboard from './components/post/Dashboard';
 import UserDetails from './components/post/UserDetails';
 import Profile from './components/account/Profile';
 import CreatePost from './components/post/CreatePost';
+import MyNetwork from './components/post/MyNetwork';
 
 // import SignUp from './account/SignUp';
 // import ForgotPassword from './account/ForgotPassword';
@@ -32,6 +33,7 @@ function App() {
 			<Route path="/user-profile" element={<UserDetails/>} />
 			<Route path="/profile" element={<Profile/>} />
 			<Route path="/create-post" element={<CreatePost/>} />
+			<Route path="/my-network" element={<MyNetwork/>} />
 
 			{/* <Route path="/sign-out" element={<SignOut/>} />
 			<Route path="/sign-up" element={<SignUp/>} />

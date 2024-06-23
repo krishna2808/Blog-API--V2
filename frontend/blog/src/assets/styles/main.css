@@ -927,3 +927,120 @@
     margin-right: 10px;
   }
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  .btn-delete {
+    background-color: #ed4956;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 3px;
+    margin-top: 5px;
+  }
+  
+  .gallery-item:hover .gallery-item-info {
+    display: block;
+  }
+  
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .gallery-item {
+    position: relative;
+    width: 100%;
+    height: 300px; /* Fixed height for gallery items */
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  
+  .gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

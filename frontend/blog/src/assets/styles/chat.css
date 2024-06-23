@@ -222,7 +222,7 @@
 
 
 
-
+/* online or offline user */
 
   .online-users {
     padding: 10px;
@@ -249,21 +249,6 @@
     color: #333;
   }
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -353,4 +338,287 @@
   .profile-pic {
     /* your existing styles for profile pictures */
   }
+  
+
+
+
+
+
+
+
+
+
+
+
+  .typing-indicator {
+    color: gray;
+    font-size: 12px;
+    margin-left: 5px;
+  }
+  
+  .typing-indicator-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-header .status.online::after {
+    content: 'Online';
+    color: green;
+    font-size: 12px;
+  }
+  
+  .chat-header .status.offline::after {
+    content: 'Offline';
+    color: red;
+    font-size: 12px;
+  }
+  
+
+
+
+
+
+
+  
+
+
+
+
+/* for chat downdownl delete and pin message  */
+
+
+  .chat-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .chat-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .chat-item:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .delete-container {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+  }
+  
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .delete-btn svg {
+    fill: #888;
+  }
+  
+  .dm-chat-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dm-chat-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .context-menu {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+    position: absolute;
+  }
+  
+  .context-menu button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    display: block;
+    margin: 0;
+    padding: 10px;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .context-menu button:hover {
+    background-color: #f1f1f1;
+  }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* chat.css */
+
+/* File input button styling */
+.file-upload-button {
+    background-color: #007bff; /* Blue background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    display: inline-block;
+  }
+  
+  .file-upload-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  .file-input {
+    display: none; /* Hide the file input visually */
+  }
+  
+  .message-input {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }
+  
+  .message-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .message-input button {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+  
+  .message-input button:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
   

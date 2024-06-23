@@ -24,6 +24,7 @@ from account.serializers import ProfileSerializer
 
 from django.http import JsonResponse
 from django.db.models import F
+from rest_framework.decorators import api_view, permission_classes
 
 
 log = log.getLogger(__name__)
@@ -59,7 +60,8 @@ class PostList(generics.ListAPIView):
         
     def get_queryset(self):
         friend_queryset = list(Friend.objects.filter(current_user = self.request.user, friend_request = 1).values_list("friend", flat=True))
-        return Post.objects.select_related("user").filter(Q(user__in = friend_queryset) | Q(user__is_private_account=False))
+        query = Q(user = self.request.user)| Q(user__in = friend_queryset) | Q(user__is_private_account=False)
+        return Post.objects.select_related("user").filter(query)
     
     
 
@@ -125,25 +127,46 @@ class UserProfileAPI(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, format=None):
+        """
+        is_friend = -1 : no friend.
+        is_friend = 0  : Friend requeste send or follow and wait to accept request
+        is_friend = 1  : Friend requested accepted (followed)
+        """
         print("request-data -------- ", request.data )
-        is_friend = True
+        is_friend = 1
+        post_count = 0 
         username = request.data.get('username')
         user = User.objects.get(username = username)
         
         is_same_user = True if request.user.username == username else False
-        if user.is_private_account == 1:
-            if Friend.objects.filter(current_user = request.user, friend__username = username, friend_request = 1 ).exists():
-                post = Post.objects.filter(user__username = username) 
-                post_count = post.count()
-                
-            else:
+        friends = Friend.objects.filter(current_user = request.user, friend__username = username)
+
+        if friends.exists():
+            is_requested = friends.first().friend_request
+            if is_requested == 0:
+                is_friend = 0
                 post = Post.objects.none()
                 post_count = Post.objects.filter(user__username = username).count() 
-                
-                is_friend = False
+            elif is_requested == 1:
+                is_friend = 1
+                post = Post.objects.filter(user__username = username) 
+                post_count = post.count()
         else:
+            is_friend = -1
+            post = Post.objects.none()
+            post_count = Post.objects.filter(user__username = username).count() 
+
+
+        if is_same_user:
             post = Post.objects.filter(user__username = username)
             post_count = post.count()
+        elif user.is_private_account == 1:
+            pass 
+        else:
+
+            post = Post.objects.filter(user__username = username)
+            post_count = post.count()
+                
         serializer_profile = ProfileSerializer(user)
         serializer = PostSerializer(post, many=True)
         following = list(
@@ -276,11 +299,30 @@ class FriendRequestAPI(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({"msg" : "Error friend request is already available"}, status=status.HTTP_400_BAD_REQUEST)
-          
+    
+    def put(self, request, format=None):
+        accept_request_user =  User.objects.get(username = request.data.get('accept_friend_request_username')) 
+        request.data['current_user'] = accept_request_user.id
+        request.data['friend'] = request.user.id
+        friend = Friend.objects.get(current_user = accept_request_user, friend = request.user)
+        serializer = FriendRequestSerializer(friend, data = request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+    
     def delete(self, request, format=None):
-        username = request.data.get('friend_unfollow_username')
-        friend  = User.objects.get(username = username)  
-        current_user = User.objects.get(id = request.user.id)
+        user_action = request.data.get("action")
+        if user_action == "cancel_friend_request":
+            username = request.data.get('cancel_friend_request_username')
+            friend  = request.user
+            current_user = User.objects.get(username = username)
+            pass 
+        elif user_action == "unfollow_friend":
+            username = request.data.get('friend_unfollow_username')
+            friend  = User.objects.get(username = username)  
+            current_user = User.objects.get(id = request.user.id)
         friend_object = Friend.objects.filter(current_user = current_user, friend = friend)
         friend_object.delete()
         return Response({"msg" : "Unfollow Friend"}, status=status.HTTP_204_NO_CONTENT)   
@@ -303,4 +345,23 @@ class SearchUser(APIView):
         if len(query) >= 3:            
             users = list(User.objects.filter(username__icontains=query).values("username"))
             return Response({"data": users})
+    
+
+
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET', 'POST'])
+def total_friend_request(request):
+    if request.method == "GET":
+        login_user = request.user 
+        total_friend_request = Friend.objects.filter(friend = login_user, friend_request = 0).count()
+        response = {
+            "total_friend_request" : total_friend_request
+        }
+        return Response(response, status=status.HTTP_200_OK)
+    return Response({"msg" : "Invaild Method"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+    
     

@@ -209,7 +209,8 @@ class LoginView(TokenObtainPairView):
         response_data = {
             'access': access_token,
             'username': user.username,
-            'id': user.id
+            'id': user.id, 
+            'login_user_image' : str(user.image.name)
         }
         return Response(response_data)
 

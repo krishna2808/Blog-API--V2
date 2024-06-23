@@ -5,6 +5,7 @@ import axios from 'axios';
 import Header from '../common/Header';
 
 const Dashboard = () => {
+
   const [posts, setPosts] = useState([]);
   const [newComments, setNewComments] = useState({});
   const [expandedComments, setExpandedComments] = useState({});

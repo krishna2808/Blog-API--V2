@@ -6,8 +6,11 @@ function UserChat({ user }) {
   const [messages, setMessages] = useState(user.chat_room || []);
   const [newMessage, setNewMessage] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const socketRef = useRef(null);
+  const [typingUsers, setTypingUsers] = useState([]);
   const [roomId, setRoomId] = useState(user.roomId);
+  const socketRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -32,6 +35,11 @@ function UserChat({ user }) {
       const newMsg = JSON.parse(event.data);
       if (newMsg.action === "onlineUser") {
         setOnlineUsers(newMsg.userList);
+      } else if (newMsg.action === "typing") {
+        handleTypingIndicator(newMsg.user);
+      } else if (newMsg.action === "file") {
+        // Handle file message received via WebSocket
+        setMessages((prevMessages) => [...prevMessages, newMsg]);
       } else {
         setMessages((prevMessages) => [...prevMessages, newMsg]);
       }
@@ -52,16 +60,81 @@ function UserChat({ user }) {
   }, [roomId]);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== '' && socketRef.current) {
-      const newMsg = {
-        message: newMessage,
-        sender: currentUser,
-        roomId: user.roomId,
-        action: "message"
-      };
-      socketRef.current.send(JSON.stringify(newMsg));
-      setNewMessage('');
+    if ((newMessage.trim() !== '' || fileInputRef.current.files.length > 0) && socketRef.current) {
+      if (newMessage.trim() !== '') {
+        const newMsg = {
+          message: newMessage,
+          sender: currentUser,
+          roomId: user.roomId,
+          action: "message"
+        };
+        socketRef.current.send(JSON.stringify(newMsg));
+        setNewMessage('');
+        clearTypingIndicator();
+      }
+
+      if (fileInputRef.current.files.length > 0) {
+        const file = fileInputRef.current.files[0];
+        const formData = new FormData();
+        formData.append('file', file); // Ensure 'file' is appended correctly
+        console.log("file ------ ", file)
+        console.log("formData ------ ", formData)
+  
+        const newFileMsg = {
+          message: `File: ${file.name}`,
+          sender: currentUser,
+          roomId: user.roomId,
+          action: "file",
+          file: formData  // Include formData directly
+        };
+  
+  
+        socketRef.current.send(JSON.stringify(newFileMsg));
+  
+        // Update local state to show the file message
+        setMessages(prevMessages => [...prevMessages, newFileMsg]);
+        
+        // Clear the file input after sending
+        fileInputRef.current.value = '';
+      }
+
+
+      
     }
+  };
+
+  const handleTypingIndicator = (username) => {
+    if (username !== currentUser) {
+      setTypingUsers((prevTypingUsers) => {
+        if (!prevTypingUsers.includes(username)) {
+          return [...prevTypingUsers, username];
+        }
+        return prevTypingUsers;
+      });
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        setTypingUsers((prevTypingUsers) => prevTypingUsers.filter((user) => user !== username));
+      }, 3000);
+    }
+  };
+
+  const handleTyping = () => {
+    if (socketRef.current) {
+      const typingMsg = {
+        action: "typing",
+        user: currentUser,
+        roomId: user.roomId,
+      };
+      socketRef.current.send(JSON.stringify(typingMsg));
+    }
+  };
+
+  const clearTypingIndicator = () => {
+    setTypingUsers((prevTypingUsers) => prevTypingUsers.filter((user) => user !== currentUser));
   };
 
   useEffect(() => {
@@ -72,6 +145,14 @@ function UserChat({ user }) {
   const selectedUser = user.type === 'DM' ? user.members[0] : null;
   const isSelectedUserOnline = selectedUser ? onlineUsers.includes(selectedUser.username) : false;
 
+  const handleFileInputChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // You can handle file selection logic here
+      console.log('Selected file:', file.name);
+    }
+  };
+
   return (
     <div>
       <h2 className="chat-header">
@@ -79,22 +160,32 @@ function UserChat({ user }) {
           <>
             <img src={selectedUser.image} alt={`${selectedUser.username}'s profile`} />
             {selectedUser.username}
-            <span className={isSelectedUserOnline ? 'status online' : 'status offline'}>
-              {isSelectedUserOnline ? 'Online' : 'Offline'}
-            </span>
+            <span className={isSelectedUserOnline ? 'status online' : 'status offline'}></span>
+            {typingUsers.includes(selectedUser.username) && (
+              <span className="typing-indicator"> is typing...</span>
+            )}
           </>
         ) : (
           <>
             <img src={user.image} alt={`${user.name}'s group pic`} />
             {user.name}
+            {typingUsers.length > 0 && (
+              <div className="typing-indicator-group">
+                {typingUsers.map((username) => (
+                  <span key={username} className="typing-indicator">
+                    {username} is typing...
+                  </span>
+                ))}
+              </div>
+            )}
           </>
         )}
       </h2>
 
       <div className="chat-messages">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message.id}
+            key={index}
             className={`chat-message ${message.sender === currentUser ? 'sent' : 'received'}`}
           >
             <div className="message-header">
@@ -114,12 +205,31 @@ function UserChat({ user }) {
           </div>
         ))}
       </div>
+
       <div className="message-input">
         <input
           type="text"
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) => {
+            setNewMessage(e.target.value);
+            handleTyping();
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleSendMessage();
+            }
+          }}
           placeholder="Type your message..."
+        />
+        <label className="file-upload-button" htmlFor="fileInput">
+          <i className="fa fa-paperclip" aria-hidden="true"></i> Attach File
+        </label>
+        <input
+          id="fileInput"
+          ref={fileInputRef}
+          type="file"
+          className="file-input"
+          onChange={handleFileInputChange}
         />
         <button onClick={handleSendMessage}>Send</button>
       </div>

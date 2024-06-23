@@ -162,22 +162,55 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        sender_id = self.userId
-        room_id = text_data_json['roomId']
+        try:
+            text_data_json = json.loads(text_data)
+            print("text_data_json ========= ", text_data_json )
+            message = text_data_json.get('message')
+            room_id = text_data_json.get('roomId')
+            action = text_data_json.get("action")
+            sender_id = self.userId
+            
+            # file_info = text_data_json.get('file', {})
+            # print("file_info --- ", file_info)
+            
+            # file_name = file_info.get('file').name
+            # file_content = file_info.get('file').read()
+            # print("file_name --- ", file_name)
+            # print("file_content --- ", file_content)
+            
+            
+            
 
-        # Save message to database
-        chatMessage = await self.save_message(message, sender_id, room_id)
+            if not action or not room_id:
+                raise ValueError("Invalid message format")
+            
+            chatMessage = {}
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat_message",
-                "message": chatMessage
-            }
-        )
+            if action == "message":
+                message = text_data_json.get('message')
+                if not message:
+                    raise ValueError("Invalid message format")
+                # Save message to database
+                chatMessage = await self.save_message(message, sender_id, room_id)
+            elif action == "typing":
+                chatMessage = {
+                    "action": "typing",
+                    "user": self.user.username,
+                    "roomId": room_id
+                }
+                
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat_message",
+                    "message": chatMessage
+                }
+            )
+        except json.JSONDecodeError:
+            print("Error decoding JSON")
+        except ValueError as e:
+            print(f"Error processing message: {e}")
 
 
     async def chat_message(self, event):

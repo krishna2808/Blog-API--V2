@@ -47,6 +47,7 @@ function SignIn() {
 				localStorage.setItem('access_token', responseData["access"]);
 				localStorage.setItem('username', responseData["username"]);
 				localStorage.setItem('user_id', responseData["id"]);
+				localStorage.setItem('login_user_image', responseData["login_user_image"]);
 			    setIsLogin(true)
 				console.log(responseData);
 			} else {
@@ -59,7 +60,6 @@ function SignIn() {
 	}
 
 	useEffect(() => {
-		debugger
 
 	}, [isLogin]);
 

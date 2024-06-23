@@ -13,6 +13,8 @@ function UserChatList({ onSelect }) {
   const [userList, setUserList] = useState([]);
   const [groupName, setGroupName] = useState('');
   const [selectedGroupUsers, setSelectedGroupUsers] = useState([]);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [pinnedChats, setPinnedChats] = useState([]);
 
   const token = localStorage.getItem('access_token');
   const url = "http://localhost:8000/chat/chat_message/";
@@ -70,6 +72,43 @@ function UserChatList({ onSelect }) {
     }
   };
 
+  const handleDeleteChat = (chatId) => {
+    var payload = {
+        "chat_room_id": chatId
+    }
+    axios.delete(`http://localhost:8000/chat/chat_message`, {
+       headers: header,
+       data: payload
+    })
+      .then(response => {
+        setChats(chats.filter(chat => chat.id !== chatId));
+      })
+      .catch(error => console.error('Error deleting chat:', error));
+  };
+
+  const handlePinChat = (chatId) => {
+    setPinnedChats((prevPinnedChats) => {
+      if (prevPinnedChats.includes(chatId)) {
+        return prevPinnedChats.filter(id => id !== chatId);
+      } else {
+        return [...prevPinnedChats, chatId];
+      }
+    });
+  };
+
+  const handleContextMenu = (event, chat) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      chat
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
   return (
     <div>
       <h2>Chats</h2>
@@ -124,7 +163,24 @@ function UserChatList({ onSelect }) {
 
       <ul className="chat-list">
         {chats.map((room) => (
-          <li key={room.id} onClick={() => onSelect(room)}>
+          <li key={room.id} className="chat-item" onClick={() => onSelect(room)}>
+            <span className="delete-container">
+              <button
+                className="delete-btn"
+                aria-label="Open the chat context menu"
+                aria-hidden="true"
+                tabIndex="0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleContextMenu(e, room);
+                }}
+              >
+                <svg viewBox="0 0 19 20" height="20" width="19" preserveAspectRatio="xMidYMid meet">
+                  <title>down</title>
+                  <path fill="currentColor" d="M3.8,6.7l5.7,5.7l5.7-5.7l1.6,1.6l-7.3,7.2L2.2,8.3L3.8,6.7z"></path>
+                </svg>
+              </button>
+            </span>
             {room.type === 'DM' ? (
               <div className="dm-chat-item">
                 <img
@@ -147,6 +203,33 @@ function UserChatList({ onSelect }) {
           </li>
         ))}
       </ul>
+
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{
+            top: contextMenu.y,
+            left: contextMenu.x,
+            position: 'absolute',
+            backgroundColor: 'white',
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+            borderRadius: '4px',
+            padding: '10px'
+          }}
+        >
+          <Button variant="link" onClick={() => {
+            handleDeleteChat(contextMenu.chat.id);
+            closeContextMenu();
+          }}>Delete Chat</Button>
+          {/* <Button variant="link" onClick={() => {
+            handlePinChat(contextMenu.chat.id);
+            closeContextMenu();
+          }}>{pinnedChats.includes(contextMenu.chat.id) ? 'Unpin Chat' : 'Pin Chat'}</Button> */}
+
+         <Button variant="link" onClick={closeContextMenu}>Close</Button>
+        </div>
+      )}
     </div>
   );
 }

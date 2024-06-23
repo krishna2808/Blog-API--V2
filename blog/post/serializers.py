@@ -43,9 +43,17 @@ class ShowOwnPostSerializer(serializers.ModelSerializer):
         fields = ['email', 'title',  'description', 'created_datetime']
 
 class FriendRequestSerializer(serializers.ModelSerializer):
+    current_user_username = serializers.StringRelatedField(source='current_user.username')
+    friend_username = serializers.StringRelatedField(source='friend.username')
+    friend_image = serializers.StringRelatedField(source='friend.image')
     class Meta:
         model = Friend 
-        fields = ['id', 'current_user', 'friend', 'friend_request', 'created_datetime']
+        fields = [
+            'id', 'current_user', 
+            'friend', 'current_user_username', 
+            'friend_username', 'friend_image',
+            'friend_request', 'created_datetime'
+        ]
 
 class NotificationSerializer(serializers.ModelSerializer):
     sender_username = serializers.StringRelatedField(source='sender.username')
