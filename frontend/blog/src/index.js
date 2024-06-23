@@ -5,6 +5,8 @@ import App from './App';
 import SignIn from './components/account/SignIn';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './assets/styles/main.css';
+
 
 // import AppRouter from './AppRouter';
 // import SignUp from './account/SignUp';

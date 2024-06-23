@@ -50,11 +50,11 @@ function Header() {
 
     return (
         <>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
                 <div className="container-fluid">
                     <Link className="navbar-brand" to="/dashboard">Home</Link>
                     <Link className="navbar-brand" to="/create-post">
-                        <img src="add_post.png" className="header-image" alt="add-post" />
+                        <img src="add_post.png" className="header-image circular-image" alt="add-post" />
                     </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
@@ -89,26 +89,39 @@ function Header() {
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/chat">
-                                    <img src="message_logo.jpeg" className="header-image" alt="Chat" />
+                                    <img src="message_logo.jpeg" className="header-image circular-image" alt="Chat" />
                                 </Link>
                             </li>
                             <li className="nav-item position-relative">
                                 <Link className="nav-link" to="/my-network">
-                                    <img src="network_logo.png" className="header-image" alt="network" />
+                                    <img src="network_logo.png" className="header-image circular-image" alt="network" />
                                     {friendRequestCount > 0 && (
                                         <span className="friend-request-count">{friendRequestCount}</span>
                                     )}
                                 </Link>
                             </li>
+                            
                             <li className="nav-item">
                                 <Link className="nav-link" to="/profile">
                                     <img 
                                         src={login_user_image ? `http://localhost:8000/media/${login_user_image}` : "profile.png"} 
-                                        className="header-image" 
+                                        className="header-image circular-image" 
                                         alt="Profile" 
                                     />
                                 </Link>
                             </li>
+
+
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/logout">
+                                    <img 
+                                        src="logout_out.png" 
+                                        className="header-image circular-image" 
+                                        alt="Profile" 
+                                    />
+                                </Link>
+                            </li>
+
                         </ul>
                     </div>
                 </div>
