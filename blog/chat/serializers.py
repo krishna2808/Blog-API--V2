@@ -16,9 +16,23 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     chat_room = serializers.StringRelatedField(source='room.roomId')
     sender = serializers.StringRelatedField(source='sender.username')
     sender_image = serializers.StringRelatedField(source='sender.image')
+    
     class Meta:
         model = ChatMessage
-        fields = ['id',  'message', 'sender', 'file',   'sender_image', 'timestamp', 'chat_room']
+        fields = ['id',  'message', 'sender', 'file', 'sender_image', 'timestamp', 'chat_room']
+
+
+    def to_representation(self, instance):
+        print("to_representation called")
+        representation = super().to_representation(instance)
+        representation['file'] = self.get_file(instance)
+        return representation
+
+    def get_file(self, obj):
+        if obj.file:
+            print("--------------- ", obj )
+            return obj.file.name  # This removes the media URL prefix
+        return None
 
 
 class MemberSerializer(serializers.Serializer):

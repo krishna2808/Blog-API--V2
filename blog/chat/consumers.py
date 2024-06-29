@@ -223,7 +223,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "action": "message",
             "user": userId,
             "roomId": roomId,
-            'send_file' : '', 
+            'file' : '', 
             "sender": userObj.username,
             "message": message,
             "sender_image": userObj.image.name if userObj.image.name else '',

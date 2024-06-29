@@ -14,6 +14,9 @@ from rest_framework.decorators import api_view, permission_classes
 import json
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+import os 
+from django.http import HttpResponse, Http404
+from django.conf import settings
 
 channel_layer = get_channel_layer()
 
@@ -36,8 +39,8 @@ def room(request, room_name):
     
 
 
-class ChatMessageAPI(APIView):
     permission_classes = [IsAuthenticated]
+class ChatMessageAPI(APIView):
     def get(self, request, format= None):
         chat_room_queryset = ChatRoom.objects.filter(members = request.user.id)
         # it have passed context in serializer because remove login user for frontend
@@ -159,7 +162,7 @@ def file_upload_send_chat(request):
             "user": userObj.id,
             "roomId": roomId,
             "sender": userObj.username,
-            "send_file" : str(chatMessageObj.file.name),  
+            "file" : str(chatMessageObj.file.name),  
             "message": message,
             "sender_image": userObj.image.name if userObj.image.name else '',
             "userName": userObj.first_name + " " + userObj.last_name if userObj.first_name and userObj.last_name else '',
@@ -177,3 +180,14 @@ def file_upload_send_chat(request):
 
         return Response(chatMessage, status=status.HTTP_200_OK)
     return Response({"msg" : "Invaild Method"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def download_chat_file(request, file_name):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'chat_files', file_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/octet-stream")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404

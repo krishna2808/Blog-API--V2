@@ -58,7 +58,7 @@ function UserChatList({ onSelect }) {
     const payload = { usernames: [username], type: "DM" };
     axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
       .then(response => {
-        setSearchResults(response.data.data);
+        // setSearchResults(response.data.data);
         window.location.reload();
       })
       .catch(error => console.error('Error fetching usernames:', error));
@@ -68,8 +68,8 @@ function UserChatList({ onSelect }) {
     if (selectedGroupUsers.length > 0 && groupName.length > 0) {
       const payload = { usernames: selectedGroupUsers, name: groupName, type: "GROUP" };
       axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
-        .then(response => {
-          setSearchResults(response.data.data);
+        .then(response => {    
+        //   setSearchResults(response.data.data);
           window.location.reload();
         })
         .catch(error => console.error('Error fetching usernames:', error));
@@ -239,3 +239,7 @@ function UserChatList({ onSelect }) {
 }
 
 export default UserChatList;
+
+
+
+

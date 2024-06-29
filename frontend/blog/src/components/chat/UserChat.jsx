@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/chat.css';
 import axios from 'axios';
-
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperclip, faDownload, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 const websocketUrl = `${process.env.REACT_APP_BACKEND_WS_URL}/ws/chat`;
 const fileUploadFromChatUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/file-upload-send-chat/`;
-
-
+const fileDownloadfromChatUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/download-chat-files/`;
 
 function UserChat({ user }) {
   const currentUser = localStorage.getItem('username');
@@ -28,7 +27,6 @@ function UserChat({ user }) {
   };
 
   useEffect(() => {
-    debugger
     if (socketRef.current) {
       if (socketRef.current.readyState === WebSocket.OPEN && socketRef.current.roomId === roomId) {
         return;
@@ -47,14 +45,12 @@ function UserChat({ user }) {
     };
 
     ws.onmessage = (event) => {
-        debugger
       const newMsg = JSON.parse(event.data);
       if (newMsg.action === "onlineUser") {
         setOnlineUsers(newMsg.userList);
       } else if (newMsg.action === "typing") {
         handleTypingIndicator(newMsg.user);
       } else if (newMsg.action === "file") {
-        // Handle file message received via WebSocket
         setMessages((prevMessages) => [...prevMessages, newMsg]);
       } else {
         setMessages((prevMessages) => [...prevMessages, newMsg]);
@@ -93,46 +89,21 @@ function UserChat({ user }) {
         const file = fileInputRef.current.files[0];
         const formData = new FormData();
 
+        formData.append('message', file.name);
+        formData.append('sender', currentUser);
+        formData.append('roomId', roomId);
+        formData.append('action', 'file');
+        formData.append('file', file);
 
-
-        formData.append('message', file.name )
-        formData.append('sender', currentUser)
-        formData.append('roomId', roomId)
-        formData.append('action', 'file')
-        formData.append('file', file); // Ensure 'file' is appended correctly
-        console.log("file ------ ", file)
-        console.log("formData ------ ", formData)
-
-
-        console.log("file ------ ", file)
-        console.log("formData ------ ", formData)
-
-  
         axios.post(fileUploadFromChatUrl, formData, { headers: header })
-        .then(response => {
-          debugger
-          var newFileMsg = response.data 
-        //   window.location.reload();
-        // setMessages(prevMessages => [...prevMessages, newFileMsg]);
-// 
-        })
-        .catch(error => console.error('Error fetching usernames:', error));
+          .then(response => {
+            var newFileMsg = response.data;
+            // Handle response if needed
+          })
+          .catch(error => console.error('Error uploading file:', error));
 
-
-        
-  
-        // socketRef.current.send(JSON.stringify(newFileMsg));
-  
-        // Update local state to show the file message
-        
-        // setMessages(prevMessages => [...prevMessages, newFileMsg]);
-        
-        // Clear the file input after sending
         fileInputRef.current.value = '';
       }
-
-
-      
     }
   };
 
@@ -181,8 +152,34 @@ function UserChat({ user }) {
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // You can handle file selection logic here
       console.log('Selected file:', file.name);
+    }
+  };
+
+  const handleFileDownload = async (fileUrl, fileName) => {
+    var file_name_list = fileName.split('/')
+    var file_name = file_name_list[file_name_list.length - 1]
+
+
+    debugger
+    try {
+    //   const response = await axios.get(fileUrl, {
+        const response = await axios.get(`${fileDownloadfromChatUrl}${file_name}`, {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error downloading the file:', error);
     }
   };
 
@@ -222,14 +219,30 @@ function UserChat({ user }) {
             className={`chat-message ${message.sender === currentUser ? 'sent' : 'received'}`}
           >
             <div className="message-header">
-              <img 
-                src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${message.sender_image}`} 
-                alt={`${message.sender}'s profile`} 
+              <img
+                src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${message.sender_image}`}
+                alt={`${message.sender}'s profile`}
                 className="profile-pic"
               />
               <div className="message-content">
                 {user.type !== 'DM' && <strong>{message.sender}</strong>}
-                <div className="message-text">{message.message}</div>
+                {message.file ? (
+                  <div className="message-text">
+                    <button
+                      className="download-button"
+                      onClick={() =>
+                        handleFileDownload(
+                          `${process.env.REACT_APP_BACKEND_API_URL}/chat/download-chat-files/${message.file}`,
+                          message.file
+                        )
+                      }
+                    >
+                      <FontAwesomeIcon icon={faDownload} /> {message.message}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="message-text">{message.message}</div>
+                )}
               </div>
               <div className="message-timestamp">
                 <span>({message.timestamp})</span>
@@ -255,7 +268,7 @@ function UserChat({ user }) {
           placeholder="Type your message..."
         />
         <label className="file-upload-button" htmlFor="fileInput">
-          <i className="fa fa-paperclip" aria-hidden="true"></i> Attach File
+          <FontAwesomeIcon icon={faPaperclip} /> Attach File
         </label>
         <input
           id="fileInput"
@@ -264,7 +277,9 @@ function UserChat({ user }) {
           className="file-input"
           onChange={handleFileInputChange}
         />
-        <button onClick={handleSendMessage}>Send</button>
+        <button onClick={handleSendMessage}>
+          <FontAwesomeIcon icon={faPaperPlane} /> Send
+        </button>
       </div>
     </div>
   );

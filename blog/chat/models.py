@@ -15,9 +15,12 @@ class ChatRoom(models.Model):
         upload_to = f"images/account/{str(datetime.now())}/",
         default='images/group_default.png'
     )
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.roomId + ' -> ' + str(self.name)
+    class Meta:
+        ordering = ["-timestamp"]
 
 class ChatMessage(models.Model):
     room = models.ForeignKey(ChatRoom, on_delete=models.SET_NULL, null=True, related_name='chat_room')
@@ -29,8 +32,8 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return self.message
-    # class Meta:
-    #     ordering = ["timestamp"]
+    class Meta:
+        ordering = ["-timestamp"]
 
 
 class OnlineUser(models.Model):

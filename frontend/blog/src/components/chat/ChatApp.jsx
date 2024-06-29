@@ -17,7 +17,7 @@ function App() {
         <UserChatList onSelect={handleUserSelect} />
       </div>
       <div className="user-chat">
-        {selectedUser ? <UserChat user={selectedUser} /> : <div>Select a chat to start messaging</div>}
+        {selectedUser ? <UserChat user={selectedUser} /> : <div className='select-chat'>Select a chat to start messaging</div>}
       </div>
     </div>
   );
