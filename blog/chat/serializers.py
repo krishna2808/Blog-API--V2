@@ -18,7 +18,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     sender_image = serializers.StringRelatedField(source='sender.image')
     class Meta:
         model = ChatMessage
-        fields = ['id',  'message', 'sender',  'sender_image', 'timestamp', 'chat_room']
+        fields = ['id',  'message', 'sender', 'file',   'sender_image', 'timestamp', 'chat_room']
 
 
 class MemberSerializer(serializers.Serializer):

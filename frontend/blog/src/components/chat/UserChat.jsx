@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../assets/styles/chat.css';
+import axios from 'axios';
+
 
 
 const websocketUrl = `${process.env.REACT_APP_BACKEND_WS_URL}/ws/chat`;
+const fileUploadFromChatUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/file-upload-send-chat/`;
+
 
 
 function UserChat({ user }) {
@@ -16,8 +20,15 @@ function UserChat({ user }) {
   const typingTimeoutRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  const token = localStorage.getItem('access_token');
+  const header = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'multipart/form-data',
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    debugger
     if (socketRef.current) {
       if (socketRef.current.readyState === WebSocket.OPEN && socketRef.current.roomId === roomId) {
         return;
@@ -36,6 +47,7 @@ function UserChat({ user }) {
     };
 
     ws.onmessage = (event) => {
+        debugger
       const newMsg = JSON.parse(event.data);
       if (newMsg.action === "onlineUser") {
         setOnlineUsers(newMsg.userList);
@@ -80,23 +92,40 @@ function UserChat({ user }) {
       if (fileInputRef.current.files.length > 0) {
         const file = fileInputRef.current.files[0];
         const formData = new FormData();
+
+
+
+        formData.append('message', file.name )
+        formData.append('sender', currentUser)
+        formData.append('roomId', roomId)
+        formData.append('action', 'file')
         formData.append('file', file); // Ensure 'file' is appended correctly
         console.log("file ------ ", file)
         console.log("formData ------ ", formData)
+
+
+        console.log("file ------ ", file)
+        console.log("formData ------ ", formData)
+
   
-        const newFileMsg = {
-          message: `File: ${file.name}`,
-          sender: currentUser,
-          roomId: user.roomId,
-          action: "file",
-          file: formData  // Include formData directly
-        };
+        axios.post(fileUploadFromChatUrl, formData, { headers: header })
+        .then(response => {
+          debugger
+          var newFileMsg = response.data 
+        //   window.location.reload();
+        // setMessages(prevMessages => [...prevMessages, newFileMsg]);
+// 
+        })
+        .catch(error => console.error('Error fetching usernames:', error));
+
+
+        
   
-  
-        socketRef.current.send(JSON.stringify(newFileMsg));
+        // socketRef.current.send(JSON.stringify(newFileMsg));
   
         // Update local state to show the file message
-        setMessages(prevMessages => [...prevMessages, newFileMsg]);
+        
+        // setMessages(prevMessages => [...prevMessages, newFileMsg]);
         
         // Clear the file input after sending
         fileInputRef.current.value = '';

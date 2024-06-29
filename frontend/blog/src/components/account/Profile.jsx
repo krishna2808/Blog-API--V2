@@ -104,7 +104,7 @@ function Profile() {
                                 <img
                                     src={typeof user.profilePic === 'string' ? user.profilePic : URL.createObjectURL(user.profilePic)}
                                     alt="Profile"
-                                    className="profile-pic"
+                                    className="profile-preview"
                                 />
                             )}
                         </div>

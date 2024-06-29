@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../../assets/styles/main.css';
 import axios from 'axios';
 import Header from '../common/Header';
+import { post } from 'jquery';
 
 const postListUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-list/`;
 const postLikeUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-like/`;
 const postCommentUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-comment/`;
+const postDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`;
 
-const Dashboard = () => {
+
+const UserPosts = () => {
     const [posts, setPosts] = useState([]);
     const [newComments, setNewComments] = useState({});
     const [expandedComments, setExpandedComments] = useState({});
@@ -16,6 +19,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('access_token');
     const loginUserId = localStorage.getItem('user_id');
     const navigate = useNavigate();
+    const location = useLocation();
 
     const header = {
         'Content-Type': 'application/json',
@@ -23,22 +27,18 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        axios.get(postListUrl, { headers: header })
-            .then(response => {
-                setPosts(response.data.results);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }, []);
+        if (location.state) {
+            setPosts(location.state.user_post);
+        }
+    }, [location]);
 
     const handleCommentChange = (postId, comment) => {
         setNewComments({ ...newComments, [postId]: comment });
     };
 
     const handleCommentSubmit = (e, post) => {
-        const postId = post.id;
         e.preventDefault();
+        const postId = post.id;
         const comment = newComments[postId];
         const payload = {
             user_id: loginUserId,
@@ -103,31 +103,75 @@ const Dashboard = () => {
         return videoExtensions.includes(extension);
     };
 
+    const handleDeletePost = (postId) => {
+        // axios.delete(`${postDeleteUrl}${postId}/`, { headers: header })
+        //     .then(response => {
+        //         setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+        //         console.log(`Deleted post with ID ${postId}`);
+        //     })
+        //     .catch(error => {
+        //         console.log('Error deleting post:', error);
+        //     });
+
+        var payload = {
+            "post_id" : postId
+          };
+          axios.delete(postDeleteUrl, {
+              headers: header,
+              data: payload
+          })
+          .then(response => {
+              console.log(`Deleting post with ID ${postId}`);
+              // Update state after deletion (assuming userDetails.user_post is an array)
+              setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+              location.state.user_post = posts
+
+            })
+            .catch(error => {
+              console.error('Error deleting post:', error);
+            });
+
+
+
+    };
+
+    const handleEditPost = (postId) => {
+        // Implement edit functionality here
+        console.log(`Editing post with ID ${postId}`);
+    };
+
     return (
         <>
             <Header />
             <div className="instagram-dashboard">
                 {posts.map(post => (
                     <div key={post.id} className="post">
+                        {location.state && location.state.friends_context && location.state.friends_context.is_same_user && (
+                            <div className="post-actions">
+                                <button onClick={() => handleEditPost(post.id)} className="edit-button">Edit</button>
+                                <button onClick={() => handleDeletePost(post.id)} className="delete-button">Delete</button>
+                            </div>
+                        )}
                         <div className="post-header">
-                            <img 
-                                src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${post.user_image}`} 
-                                alt={`${post.username}'s profile`} 
-                                className="user-image" 
+                            <img
+                                src={`${process.env.REACT_APP_BACKEND_API_URL}/media/${post.user_image}`}
+                                alt={`${post.username}'s profile`}
+                                className="user-image"
                                 onClick={() => goToProfile(post.username)}
                             />
-                            <p className="post-username" onClick={() => goToProfile(post.username)}> {post.username}</p>
+                            <p className="post-username" onClick={() => goToProfile(post.username)}>Posted by: {post.username}</p>
                         </div>
                         <p className="post-title">Title: {post.title}</p>
                         <p className="post-created-datetime">Created on: {new Date(post.created_datetime).toLocaleString()}</p>
                         {post.file && (
                             isVideo(post.file) ? (
                                 <video controls className="post-media">
-                                    <source src={post.file} type="video/mp4" />
+                                    <source src={`${process.env.REACT_APP_BACKEND_API_URL}${post.file}`} type="video/mp4" />
                                     Your browser does not support the video tag.
                                 </video>
                             ) : (
-                                <img src={post.file} alt="Post" className="post-media" />
+                                <img src={`${process.env.REACT_APP_BACKEND_API_URL}${post.file}`} className="gallery-image" alt={post.title} />
+
                             )
                         )}
                         <p className="post-description">Description: {post.description}</p>
@@ -156,7 +200,6 @@ const Dashboard = () => {
                                     )}
                                 </div>
                             )}
-                            <button onClick={() => handleLike(post.id)} className="like-button">Like</button>
                             <ul className="post-comments">
                                 {post.post_comment && post.post_comment.slice(0, expandedComments[post.id] ? post.post_comment.length : 1).map(comment => (
                                     <li key={comment.id} className="comment">
@@ -195,4 +238,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default UserPosts;

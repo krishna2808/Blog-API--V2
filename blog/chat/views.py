@@ -10,10 +10,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Q, F
 
-
-
-
+from rest_framework.decorators import api_view, permission_classes
 import json
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+channel_layer = get_channel_layer()
+
+
+
+
+
 
 def index(request):
     return render(request, "chat/index.html")
@@ -103,11 +110,7 @@ class ChatMessageAPI(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
 
-
-         
-    
 class SearchChatUser(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -125,8 +128,52 @@ class SearchChatUser(APIView):
         else:
             users = list(User.objects.exclude(username = request.user.username).values("username"))
             return Response({"data": users}) 
-    
-         
-    
-    
-    
+
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def file_upload_send_chat(request):
+    print("calling function ------- file_upload_send_chat")
+    if request.method == "POST":
+        data = request.data
+        print('data ----------- ', data )
+        roomId = data.get('roomId')
+        userObj = request.user
+        message = data.get('message')
+        file = data.get("file")
+        print("file -in post-------- ", file)
+        
+        # userObj = User.objects.get(username = sender)
+        chatObj = ChatRoom.objects.get(roomId=roomId)
+        chatMessageObj = ChatMessage.objects.create(
+            file = file,
+            room=chatObj, 
+            sender=userObj, 
+            message=message
+        )
+        
+        
+        chatMessage =  {
+            "action": "message",
+            "user": userObj.id,
+            "roomId": roomId,
+            "sender": userObj.username,
+            "send_file" : str(chatMessageObj.file.name),  
+            "message": message,
+            "sender_image": userObj.image.name if userObj.image.name else '',
+            "userName": userObj.first_name + " " + userObj.last_name if userObj.first_name and userObj.last_name else '',
+            "timestamp": str(chatMessageObj.timestamp),
+        }
+        
+        print('roomId -inside post method ------', roomId)
+        async_to_sync(channel_layer.group_send)(
+            f'chat_{roomId}',  # roodId
+            {
+                'type': 'chat_message',  # Method name in consumer
+                'message': chatMessage,  
+            }
+        )
+
+        return Response(chatMessage, status=status.HTTP_200_OK)
+    return Response({"msg" : "Invaild Method"}, status=status.HTTP_400_BAD_REQUEST)

@@ -66,8 +66,8 @@ function CreatePost() {
                         <textarea className="form-control" id="description" name="description" value={post.description} onChange={handleChange} required />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="image" className="form-label">Post Image</label>
-                        <input type="file" className="form-control" id="image" name="image" onChange={handleChange} accept="image/*" required />
+                        <label htmlFor="image" className="form-label">Post Image/Video</label>
+                        <input type="file" className="form-control" id="image" name="image" onChange={handleChange} accept="image/*,video/*" required />
                     </div>
                     <button type="submit" className="btn btn-primary">Create Post</button>
                 </form>

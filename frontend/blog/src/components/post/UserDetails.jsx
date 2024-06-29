@@ -5,10 +5,10 @@ import '../../assets/styles/main.css';
 import Header from '../common/Header';
 import Popup from './Popup'; // Import the Popup component
 
-const friendRequestGetUpdateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/friend-request/`
-const userProfileUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/user-profile/`
-const postDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`
-
+const friendRequestGetUpdateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/friend-request/`;
+const userProfileUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/user-profile/`;
+const postDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`;
+const likePostUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/like/`;
 
 const UserDetails = () => {
   const { username } = useParams();
@@ -65,31 +65,29 @@ const UserDetails = () => {
     navigate('/profile');
   };
 
-  const handleDeletePost = (postId) => {
+  const handleLikePost = (postId) => {
     var payload = {
-      "post_id" : postId
-    }
-    axios.delete(postDeleteUrl, {
-        headers: header,
-        data: payload
-    })
-    .then(response => {
-        console.log(`Deleting post with ID ${postId}`);
-        // Example of how to update state after deletion (assuming userDetails.user_post is an array)
+      "post_id": postId
+    };
+    axios.post(likePostUrl, payload, { headers: header })
+      .then(response => {
+        // Update the state with new like count
         setUserDetails(prevState => ({
           ...prevState,
-          user_post: prevState.user_post.filter(post => post.id !== postId)
+          user_post: prevState.user_post.map(post => 
+            post.id === postId ? { ...post, post_like: response.data.likes } : post
+          )
         }));
       })
       .catch(error => {
-        console.error('Error deleting post:', error);
+        console.error('Error liking post:', error);
       });
   };
 
   const handleFollow = () => {
     var payload = {
         "friend_request_username": profile_username
-    }
+    };
     axios.post(friendRequestGetUpdateDeleteUrl , 
         payload, 
         { headers: header }
@@ -111,11 +109,10 @@ const UserDetails = () => {
   };
 
   const handleUnfollow = () => {
-    debugger
     var payload = {
         "friend_unfollow_username" : userDetails.user_profile.username,
         "action" : "unfollow_friend"
-    }
+    };
     axios.delete(friendRequestGetUpdateDeleteUrl, {
        headers: header,
        data: payload
@@ -136,9 +133,19 @@ const UserDetails = () => {
     });
   };
 
+  const isVideo = (fileName) => {
+    const videoExtensions = ['mp4', 'mov', 'avi', 'mkv'];
+    const extension = fileName.split('.').pop().toLowerCase();
+    return videoExtensions.includes(extension);
+  };
+
+  const handlePostClick = () => {
+    navigate(`/UserPosts/`,  { state: userDetails});
+  };
+
   return (
     <>
-      <Header/>
+      <Header />
       <header className="profile-header">
         <div className="profile">
           <div className="profile-image">
@@ -149,18 +156,18 @@ const UserDetails = () => {
             {showEditProfileButton ? (
               <button className="btn profile-edit-btn" onClick={handleEditProfile}>Edit Profile</button>
             ) : (
-                userDetails.friends_context.is_friend === 1 ? (
-                    <button className="btn profile-edit-btn" onClick={handleUnfollow}>Unfollow</button>
-                  ) : userDetails.friends_context.is_friend === 0 ? (
-                    <button className="btn profile-edit-btn" disabled>Requested</button>
-                  ) : (
-                    <button className="btn profile-edit-btn" onClick={handleFollow}>Follow</button>
-                  )
+              userDetails.friends_context.is_friend === 1 ? (
+                <button className="btn profile-edit-btn" onClick={handleUnfollow}>Unfollow</button>
+              ) : userDetails.friends_context.is_friend === 0 ? (
+                <button className="btn profile-edit-btn" disabled>Requested</button>
+              ) : (
+                <button className="btn profile-edit-btn" onClick={handleFollow}>Follow</button>
+              )
             )}
           </div>
           <div className="profile-stats">
             <ul>
-              {userDetails.friends_context.is_friend == 1 || userDetails.friends_context.is_same_user  ? (
+              {userDetails.friends_context.is_friend === 1 || userDetails.friends_context.is_same_user ? (
                 <>
                   <li><span className="profile-stat-count">{userDetails.user_post.length}</span> posts</li>
                   <li onClick={openFollowersPopup}><span className="profile-stat-count">{userDetails.friends_context.follower_count}</span> followers</li>
@@ -174,18 +181,25 @@ const UserDetails = () => {
                 </>
               )}
             </ul>
-          </div> 
+          </div>
         </div>
       </header>
 
       <main className="main">
         <div className="gallery">
           {userDetails.user_post.map(post => (
-            <div className="gallery-item" key={post.id} tabIndex="0">
-              <img src={`${process.env.REACT_APP_BACKEND_API_URL}${post.file}`} className="gallery-image" alt={post.title} />
+            <div className="gallery-item" key={post.id} tabIndex="0" onClick={() => handlePostClick()}>
+              {isVideo(post.file) ? (
+                               <video controls className="post-media">
+                               <source src={post.file} type="video/mp4" />
+                               Your browser does not support the video tag.
+                           </video>
+              ) : (
+                <img src={`${process.env.REACT_APP_BACKEND_API_URL}${post.file}`} className="gallery-image" alt={post.title} />
+              )}
               <div className="gallery-item-info">
                 <ul>
-                  <li className="gallery-item-likes">
+                  <li className="gallery-item-likes" onClick={(e) => { e.stopPropagation(); handleLikePost(post.id); }}>
                     <span className="visually-hidden">Likes:</span>
                     <i className="fas fa-heart" aria-hidden="true"></i> {post.post_like.length}
                   </li>
@@ -194,9 +208,6 @@ const UserDetails = () => {
                     <i className="fas fa-comment" aria-hidden="true"></i> {post.post_comment.length}
                   </li>
                 </ul>
-                {showEditProfileButton && (
-                  <button className="btn-delete" onClick={() => handleDeletePost(post.id)}>Delete</button>
-                )}
               </div>
             </div>
           ))}

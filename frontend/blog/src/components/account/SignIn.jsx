@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
 // import Header from '../common/header';
 import '../../assets/styles/main.css' 
 
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 import { BLOG_API_URL } from '../../config';
 import Dashboard from '../post/Dashboard';
@@ -17,6 +18,7 @@ function SignIn() {
 	const [username, setUsername] = useState(false);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+    const navigate = useNavigate();
     //Normal function 
     // async function onSubmit(e){
     // arrow function SignIn

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import '../../assets/styles/main.css';
 import axios from 'axios';
 import Header from '../common/Header';
 
 const postListUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-list/`;
+const postDetailsUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-details/`;
 const postLikeUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-like/`;
 const postCommentUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/post-comment/`;
 
-const Dashboard = () => {
+const PostDetails = () => {
+    const { id } = useParams();
     const [posts, setPosts] = useState([]);
     const [newComments, setNewComments] = useState({});
     const [expandedComments, setExpandedComments] = useState({});
@@ -23,9 +26,10 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        axios.get(postListUrl, { headers: header })
+        axios.get(`${postDetailsUrl}${id}/`, { headers: header })
             .then(response => {
-                setPosts(response.data.results);
+
+                setPosts([response.data]);
             })
             .catch(error => {
                 console.log(error);
@@ -116,7 +120,7 @@ const Dashboard = () => {
                                 className="user-image" 
                                 onClick={() => goToProfile(post.username)}
                             />
-                            <p className="post-username" onClick={() => goToProfile(post.username)}> {post.username}</p>
+                            <p className="post-username" onClick={() => goToProfile(post.username)}>Posted by: {post.username}</p>
                         </div>
                         <p className="post-title">Title: {post.title}</p>
                         <p className="post-created-datetime">Created on: {new Date(post.created_datetime).toLocaleString()}</p>
@@ -195,4 +199,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default PostDetails;

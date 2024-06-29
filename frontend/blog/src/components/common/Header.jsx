@@ -3,15 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../../assets/styles/header.css';
 import axios from 'axios';
 
-
-const totalFriendRequestUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/total-friend-request/`
-const searchUserUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/search_user`
-
+const totalFriendRequestUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/total-friend-request/`;
+const searchUserUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/search_user`;
+const notificationUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/notification/`;
 
 function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [friendRequestCount, setFriendRequestCount] = useState(0);
+    const [notificationCount, setNotificationCount] = useState(0);
     const navigate = useNavigate();
     const token = localStorage.getItem('access_token');
     const login_user_image = localStorage.getItem('login_user_image');
@@ -29,6 +29,16 @@ function Header() {
             })
             .catch(error => {
                 console.error('Error fetching friend request count:', error);
+            });
+
+        // Fetch the count of notifications
+        axios.get(notificationUrl, { headers: header })
+            .then(response => {
+                const unreadNotifications = response.data.filter(notification => !notification.status).length;
+                setNotificationCount(unreadNotifications);
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
             });
     }, []);
 
@@ -51,6 +61,10 @@ function Header() {
         localStorage.setItem('profile_username', username);
         navigate(`/user-profile/?username=${username}`);
         window.location.reload();
+    };
+
+    const handleNotificationClick = () => {
+        navigate('/notifications');
     };
 
     return (
@@ -105,7 +119,14 @@ function Header() {
                                     )}
                                 </Link>
                             </li>
-                            
+                            <li className="nav-item position-relative">
+                                <span className="nav-link" onClick={handleNotificationClick}>
+                                    <img src="notifications.png" className="header-image circular-image" alt="Notifications" />
+                                    {notificationCount > 0 && (
+                                        <span className="notification-count">{notificationCount}</span>
+                                    )}
+                                </span>
+                            </li>
                             <li className="nav-item">
                                 <Link className="nav-link" to="/profile">
                                     <img 
@@ -115,18 +136,15 @@ function Header() {
                                     />
                                 </Link>
                             </li>
-
-
                             <li className="nav-item">
                                 <Link className="nav-link" to="/logout">
                                     <img 
                                         src="logout_out.png" 
                                         className="header-image circular-image" 
-                                        alt="Profile" 
+                                        alt="logout" 
                                     />
                                 </Link>
                             </li>
-
                         </ul>
                     </div>
                 </div>
