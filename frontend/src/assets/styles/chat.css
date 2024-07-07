@@ -237,25 +237,30 @@
     color: #333;
   }
   
-  .online-users ul {
+.online-users ul {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
+}
   
-  .online-users ul li {
+.online-users ul li {
     padding: 5px 0;
     font-size: 14px;
     color: #333;
-  }
-  
+}
 
+.chat-profile-image{
+    height: 50px;
+    width: 50px;
+    margin-right: 5px ;
+    margin-left: 15px ;
+    border-radius: 50%;
 
+    border-radius: 50%;
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
 
-
-
-
-
+}
 
 
 
@@ -414,6 +419,9 @@
     padding: 10px;
     z-index: 1000;
     position: absolute;
+
+
+
 }
   
 .context-menu button {
@@ -432,16 +440,6 @@
     background-color: #f1f1f1;
 }
     
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -527,4 +525,17 @@
 }
 
 
+/* Add this to your chat.css or an appropriate CSS file */
 
+.no-underline {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+  
+.no-underline h4 {
+    margin: 0;
+    padding-left: 10px; /* Adjust spacing between image and username */
+    color:black;
+}
+  

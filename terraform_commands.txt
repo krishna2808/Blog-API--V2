@@ -1,0 +1,73 @@
+# Terraform Commands
+
+## Initialization
+- `terraform init`  
+  Initialize a new or existing Terraform configuration.
+
+## Validation
+- `terraform validate`  
+  Validate the Terraform configuration files.
+
+## Formatting
+- `terraform fmt`  
+  Reformat your configuration in the standard style.
+
+## Plan
+- `terraform plan`  
+  Generate and show an execution plan.
+
+## Apply
+- `terraform apply`  
+  Build or change infrastructure.
+
+## Destroy
+- `terraform destroy`  
+  Destroy Terraform-managed infrastructure.
+
+## Graph
+- `terraform graph`  
+  Generate a visual representation of the configuration.
+
+## Show
+- `terraform show`  
+  Show the current state or a saved plan.
+
+## State
+- `terraform state list`  
+  List resources in the Terraform state.
+- `terraform state show [address]`  
+  Show a resource in the Terraform state.
+
+## Import
+- `terraform import [address] [id]`  
+  Import existing infrastructure into Terraform.
+
+## Output
+- `terraform output`  
+  Read an output from a state file.
+
+## Workspace
+- `terraform workspace list`  
+  List all workspaces.
+- `terraform workspace select [name]`  
+  Select a workspace.
+- `terraform workspace new [name]`  
+  Create a new workspace.
+
+## Providers
+- `terraform providers`  
+  Show the providers required for this configuration.
+
+## Modules
+- `terraform get`  
+  Download and update modules mentioned in the configuration.
+
+## Debugging
+- `terraform console`  
+  Interactive console for Terraform interpolations.
+- `terraform debug`  
+  Debug output management (set `TF_LOG` environment variable for more details).
+
+## Documentation
+- `terraform doc`  
+  Generate documentation from Terraform modules.

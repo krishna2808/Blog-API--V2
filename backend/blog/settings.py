@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     # when rest_framework include in setting then it is given option to crud operation from brower and when you have installed pip install Markdown
     # 'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
     'account',
     'post',
     'chat',
@@ -91,6 +90,8 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'blog.wsgi.application'
+
+# Channels
 ASGI_APPLICATION = "blog.asgi.application"
 
 
@@ -242,8 +243,7 @@ SIMPLE_JWT = {
 
 
 
-# Channels
-# ASGI_APPLICATION = "blog.asgi.application"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -339,11 +339,21 @@ CACHES = {
 # }
 
 
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
+
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
     },
 }
+
 
 
 

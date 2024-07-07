@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../../assets/styles/chat.css';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faDownload, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
@@ -18,12 +17,28 @@ function UserChat({ user }) {
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const fileInputRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   const token = localStorage.getItem('access_token');
   const header = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'multipart/form-data',
+  };
+
+  const formatDate = (datetime) => {
+    const date = new Date(datetime);
+
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Months are zero-based
+    const year = date.getFullYear();
+
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
   };
 
   useEffect(() => {
@@ -46,15 +61,16 @@ function UserChat({ user }) {
 
     ws.onmessage = (event) => {
       const newMsg = JSON.parse(event.data);
-      if (newMsg.action === "onlineUser") {
+      if (newMsg.action === 'onlineUser') {
         setOnlineUsers(newMsg.userList);
-      } else if (newMsg.action === "typing") {
+      } else if (newMsg.action === 'typing') {
         handleTypingIndicator(newMsg.user);
-      } else if (newMsg.action === "file") {
+      } else if (newMsg.action === 'file') {
         setMessages((prevMessages) => [...prevMessages, newMsg]);
       } else {
         setMessages((prevMessages) => [...prevMessages, newMsg]);
       }
+      scrollToBottom();
     };
 
     ws.onerror = (error) => {
@@ -71,6 +87,12 @@ function UserChat({ user }) {
     };
   }, [roomId]);
 
+  useEffect(() => {
+    setRoomId(user.roomId);
+    setMessages(user.chat_room || []);
+    scrollToBottom();
+  }, [user]);
+
   const handleSendMessage = () => {
     if ((newMessage.trim() !== '' || fileInputRef.current.files.length > 0) && socketRef.current) {
       if (newMessage.trim() !== '') {
@@ -78,7 +100,7 @@ function UserChat({ user }) {
           message: newMessage,
           sender: currentUser,
           roomId: user.roomId,
-          action: "message"
+          action: 'message',
         };
         socketRef.current.send(JSON.stringify(newMsg));
         setNewMessage('');
@@ -95,12 +117,13 @@ function UserChat({ user }) {
         formData.append('action', 'file');
         formData.append('file', file);
 
-        axios.post(fileUploadFromChatUrl, formData, { headers: header })
-          .then(response => {
+        axios
+          .post(fileUploadFromChatUrl, formData, { headers: header })
+          .then((response) => {
             var newFileMsg = response.data;
             // Handle response if needed
           })
-          .catch(error => console.error('Error uploading file:', error));
+          .catch((error) => console.error('Error uploading file:', error));
 
         fileInputRef.current.value = '';
       }
@@ -129,7 +152,7 @@ function UserChat({ user }) {
   const handleTyping = () => {
     if (socketRef.current) {
       const typingMsg = {
-        action: "typing",
+        action: 'typing',
         user: currentUser,
         roomId: user.roomId,
       };
@@ -140,11 +163,6 @@ function UserChat({ user }) {
   const clearTypingIndicator = () => {
     setTypingUsers((prevTypingUsers) => prevTypingUsers.filter((user) => user !== currentUser));
   };
-
-  useEffect(() => {
-    setRoomId(user.roomId);
-    setMessages(user.chat_room || []);
-  }, [user]);
 
   const selectedUser = user.type === 'DM' ? user.members[0] : null;
   const isSelectedUserOnline = selectedUser ? onlineUsers.includes(selectedUser.username) : false;
@@ -157,14 +175,11 @@ function UserChat({ user }) {
   };
 
   const handleFileDownload = async (fileUrl, fileName) => {
-    var file_name_list = fileName.split('/')
-    var file_name = file_name_list[file_name_list.length - 1]
+    var file_name_list = fileName.split('/');
+    var file_name = file_name_list[file_name_list.length - 1];
 
-
-    debugger
     try {
-    //   const response = await axios.get(fileUrl, {
-        const response = await axios.get(`${fileDownloadfromChatUrl}${file_name}`, {
+      const response = await axios.get(`${fileDownloadfromChatUrl}${file_name}`, {
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -182,6 +197,16 @@ function UserChat({ user }) {
       console.error('Error downloading the file:', error);
     }
   };
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div>
@@ -212,7 +237,7 @@ function UserChat({ user }) {
         )}
       </h2>
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={chatContainerRef}>
         {messages.map((message, index) => (
           <div
             key={index}
@@ -245,7 +270,7 @@ function UserChat({ user }) {
                 )}
               </div>
               <div className="message-timestamp">
-                <span>({message.timestamp})</span>
+                <span>({formatDate(message.timestamp)})</span>
               </div>
             </div>
           </div>
@@ -268,17 +293,17 @@ function UserChat({ user }) {
           placeholder="Type your message..."
         />
         <label className="file-upload-button" htmlFor="fileInput">
-          <FontAwesomeIcon icon={faPaperclip} /> Attach File
+          <FontAwesomeIcon icon={faPaperclip} />
         </label>
         <input
+          type="file"
           id="fileInput"
           ref={fileInputRef}
-          type="file"
-          className="file-input"
+          style={{ display: 'none' }}
           onChange={handleFileInputChange}
         />
-        <button onClick={handleSendMessage}>
-          <FontAwesomeIcon icon={faPaperPlane} /> Send
+        <button className="send-button" onClick={handleSendMessage}>
+          <FontAwesomeIcon icon={faPaperPlane} />
         </button>
       </div>
     </div>

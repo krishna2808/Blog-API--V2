@@ -58,6 +58,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     sender_username = serializers.StringRelatedField(source='sender.username')
     receiver_username = serializers.StringRelatedField(source='receiver.username')
+    sender_image = serializers.StringRelatedField(source='sender.image')
     class Meta:
         model = Notification
-        fields = ['id', 'sender', 'sender_username', 'post', 'receiver', 'receiver_username',  'status', 'notification_type', 'created_datetime' ]
+        fields = ['id', 'sender', 'sender_image', 'sender_username', 'post', 'receiver', 'receiver_username',  'status', 'notification_type', 'created_datetime' ]

@@ -10,7 +10,9 @@ urlpatterns = [
     path('friend-request/', FriendRequestAPI.as_view(), name="friend-request"),
     path('total-friend-request/', total_friend_request, name="total-friend-request"),
     path('notification/', NotificationAPI.as_view(), name="notification"),
+    path('notification/<int:pk>/', NotificationAPI.as_view(), name="notification-detail"),
     path('search_user/', SearchUser.as_view(), name = 'search_user'),
+    path('post-details/<int:pk>/', PostDetail.as_view(), name='post-detail'),
     
     # path('user-details/', UserDetailsAPI.as_view(), name="user-details"),
     path('fun/', fun, name="fun"),

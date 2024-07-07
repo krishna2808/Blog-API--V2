@@ -88,15 +88,16 @@ class PostCreateAndListAndUpdateDescostory(APIView):
 		}                 
         return Response({'own_post' : serializer.data, 'friends_context' : friends_context  }, status=status.HTTP_200_OK)
     def post(self, request, format=None):
-        post_data = request.data.copy()
-        post_data['user'] = request.user.id
+        # post_data = request.data.copy()
+        # post_data['user'] = request.user.id
+        request.data['user'] = request.user.id
         # post_data = request.data 
-        serializer = PostSerializer(data=post_data) 
+        serializer = PostSerializer(data=request.data) 
         if serializer.is_valid():
             print("save -------- ")
             serializer.save()
-            # post_notification.delay(request.user.id, post_id = serializer.data['id'], type = "posted")
-            post_notification(request.user.id, post_id = serializer.data['id'], type = "posted")
+            post_notification.delay(request.user.id, post_id = serializer.data['id'], type = "posted")
+            # post_notification(request.user.id, post_id = serializer.data['id'], type = "posted")
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -334,6 +335,13 @@ class NotificationAPI(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(receiver = user)
+    
+    def put(self, request, pk=None ):
+        instance = self.get_object()
+        serializer = NotificationSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class SearchUser(APIView):
@@ -350,7 +358,6 @@ class SearchUser(APIView):
 
 
 
-
 @permission_classes([IsAuthenticated])
 @api_view(['GET', 'POST'])
 def total_friend_request(request):
@@ -364,5 +371,6 @@ def total_friend_request(request):
     return Response({"msg" : "Invaild Method"}, status=status.HTTP_400_BAD_REQUEST)
         
     
-    
-    
+class PostDetail(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer

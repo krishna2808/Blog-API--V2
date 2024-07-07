@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, Modal, Form, ListGroup } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../assets/styles/chat.css';
 
-
 const chatMessageGetCreateDeleteUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/chat_message/`;
 const searchChatUserUrl = `${process.env.REACT_APP_BACKEND_API_URL}/chat/search_chat_user`;
-
+const login_user_image = localStorage.getItem('login_user_image');
+const login_username = localStorage.getItem('username');
 
 function UserChatList({ onSelect }) {
   const [chats, setChats] = useState([]);
@@ -26,6 +27,8 @@ function UserChatList({ onSelect }) {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
   };
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     if (searchQuery.length >= 3) {
@@ -58,31 +61,27 @@ function UserChatList({ onSelect }) {
     const payload = { usernames: [username], type: "DM" };
     axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
       .then(response => {
-        // setSearchResults(response.data.data);
         window.location.reload();
       })
-      .catch(error => console.error('Error fetching usernames:', error));
+      .catch(error => console.error('Error creating new chat:', error));
   };
 
   const handleGroupAdd = () => {
     if (selectedGroupUsers.length > 0 && groupName.length > 0) {
       const payload = { usernames: selectedGroupUsers, name: groupName, type: "GROUP" };
       axios.post(chatMessageGetCreateDeleteUrl, payload, { headers: header })
-        .then(response => {    
-        //   setSearchResults(response.data.data);
+        .then(response => {
           window.location.reload();
         })
-        .catch(error => console.error('Error fetching usernames:', error));
+        .catch(error => console.error('Error creating group chat:', error));
     }
   };
 
   const handleDeleteChat = (chatId) => {
-    var payload = {
-        "chat_room_id": chatId
-    }
+    var payload = { "chat_room_id": chatId };
     axios.delete(chatMessageGetCreateDeleteUrl, {
-       headers: header,
-       data: payload
+      headers: header,
+      data: payload
     })
       .then(response => {
         setChats(chats.filter(chat => chat.id !== chatId));
@@ -115,7 +114,15 @@ function UserChatList({ onSelect }) {
 
   return (
     <div>
-      <h2>Chats</h2>
+      <Link to="/profile" className="no-underline">
+        <img
+          src={login_user_image ? `${process.env.REACT_APP_BACKEND_API_URL}/media/${login_user_image}` : "profile.png"}
+          className="chat-profile-image"
+          alt="Profile"
+        />
+        <h4>{login_username}</h4>
+      </Link>
+
       <Button onClick={() => setShowNewChatModal(true)}>New Chat</Button>
       <Modal show={showNewChatModal} onHide={() => setShowNewChatModal(false)}>
         <Modal.Header closeButton>
@@ -226,12 +233,7 @@ function UserChatList({ onSelect }) {
             handleDeleteChat(contextMenu.chat.id);
             closeContextMenu();
           }}>Delete Chat</Button>
-          {/* <Button variant="link" onClick={() => {
-            handlePinChat(contextMenu.chat.id);
-            closeContextMenu();
-          }}>{pinnedChats.includes(contextMenu.chat.id) ? 'Unpin Chat' : 'Pin Chat'}</Button> */}
-
-         <Button variant="link" onClick={closeContextMenu}>Close</Button>
+          <Button variant="link" onClick={closeContextMenu}>Close</Button>
         </div>
       )}
     </div>
@@ -239,7 +241,3 @@ function UserChatList({ onSelect }) {
 }
 
 export default UserChatList;
-
-
-
-

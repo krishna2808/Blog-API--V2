@@ -13,15 +13,20 @@ const signInUrl = `${process.env.REACT_APP_BACKEND_API_URL}/account/signin/`
 
 
 function SignIn() {
-	const [isLogin, setIsLogin] = useState(false);
-	const [accessToken, setAccesssToken] = useState(false);
-	const [username, setUsername] = useState(false);
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+
+    // localStorage.removeItem('access_token');
+    // localStorage.removeItem('username');
+    // localStorage.removeItem('user_id');
+    // localStorage.removeItem('login_user_image');
+
+    const [isLogin, setIsLogin] = useState(false);
+    const [accessToken, setAccesssToken] = useState(false);
+    const [username, setUsername] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    //Normal function 
-    // async function onSubmit(e){
-    // arrow function SignIn
+
+
 	const onSubmit = async (e) =>{
 		console.log("click when ", e)
 		const payload = {
@@ -65,12 +70,10 @@ function SignIn() {
 	}, [isLogin]);
 
 	if(accessToken){
-		return(
-            <>
-               <Dashboard/>
-            
-            </>
-        );
+
+        navigate('/dashboard');
+        window.location.reload();
+
 	}
 
 

@@ -23,15 +23,13 @@ class ChatMessageSerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
-        print("to_representation called")
         representation = super().to_representation(instance)
         representation['file'] = self.get_file(instance)
         return representation
 
     def get_file(self, obj):
         if obj.file:
-            print("--------------- ", obj )
-            return obj.file.name  # This removes the media URL prefix
+            return obj.file.name 
         return None
 
 
@@ -75,6 +73,4 @@ class ChatRoomPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatRoom
         fields = ['id', 'roomId', 'chat_room', 'type', "name", "members","image"]
-
-
 

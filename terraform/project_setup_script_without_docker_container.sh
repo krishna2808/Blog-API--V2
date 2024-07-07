@@ -9,8 +9,8 @@ sudo chmod 777 /etc/nginx/sites-available/project_blog.conf
 
 # set linux environemnt 
 
-GITHUB_ACCESS_TOKEN="a"
-GITHUB_USERNAME="a"
+GITHUB_ACCESS_TOKEN="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"
+GITHUB_USERNAME="krishna2808"
 
 sudo mkdir -p /app
 # sudo git clone https://github.com/krishna2808/Blog-API--V2.git /app/blog_project
