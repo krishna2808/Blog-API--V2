@@ -9,7 +9,7 @@ sudo chmod 777 /etc/nginx/sites-available/project_blog.conf
 
 # set linux environemnt 
 
-GITHUB_ACCESS_TOKEN="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"
+GITHUB_ACCESS_TOKEN=""
 GITHUB_USERNAME="krishna2808"
 
 sudo mkdir -p /app
