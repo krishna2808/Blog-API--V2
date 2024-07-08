@@ -39,7 +39,7 @@ class MemberSerializer(serializers.Serializer):
 
 class ChatRoomGetSerializer(serializers.ModelSerializer):
     
-    # reversed relation because chat_room is related_name name. ChatRoom is referenced by ChatRoom via the ForeignKey. We access this relation through related_name='chat_room'
+    # reversed relation because chat_room is related_name name. ChatMessage is referenced by ChatRoom via the ForeignKey. We access this relation through related_name='chat_room' Relation Parent to child
     chat_room = ChatMessageSerializer(many=True, read_only=True)
     
     # direct relation because members is (manytomany or onetoone or freign key) child to parent realtion 
@@ -68,7 +68,7 @@ class ChatRoomGetSerializer(serializers.ModelSerializer):
 
 class ChatRoomPostSerializer(serializers.ModelSerializer):
     
-    # reversed relation because chat_room is related_name name. ChatRoom is referenced by ChatRoom via the ForeignKey. We access this relation through related_name='chat_room'
+    # reversed relation because chat_room is related_name name. ChatMessage is referenced by ChatRoom via the ForeignKey. We access this relation through related_name='chat_room'. Relation Parent to child
     chat_room = ChatMessageSerializer(many=True, read_only=True)    
     class Meta:
         model = ChatRoom

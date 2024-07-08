@@ -34,7 +34,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog.settings")
 
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     "websocket": JWTAuthMiddlewareStack(
         URLRouter(
             websocket_urlpatterns
