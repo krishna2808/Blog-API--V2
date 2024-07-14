@@ -14,7 +14,6 @@ Welcome to the Blog API V2! This project is an advanced version of the Blog API,
 - [Endpoints](#endpoints)
 - [Contributing](#contributing)
 - [License](#license)
-- 
 
 ## Features
 
@@ -108,6 +107,15 @@ Welcome to the Blog API V2! This project is an advanced version of the Blog API,
 - **JWT**: Authentication using JSON Web Tokens
 - **Redis server**: Redis server for Websocket.
 
+
+## Screenshots
+
+
+<!-- [![Watch the video](https://img.youtube.com/vi/RpXl9Rzfjp4/maxresdefault.jpg)](https://youtu.be/RpXl9Rzfjp4) -->
+
+![Screencast from 2024-07-01](https://github.com/krishna2808/Templates/blob/main/image/Screencast%20from%202024-07-01%2021-23-45.gif)
+<br>
+<a href="https://youtu.be/RpXl9Rzfjp4" target="_blank">Watch Video</a>
 
 ## Usage
 
