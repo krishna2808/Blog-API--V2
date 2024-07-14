@@ -29,9 +29,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
            
             await database_sync_to_async(self.addOnlineUser)(self.user)
             await self.sendOnlineUserList()
-            
-            
-            
 
             await self.accept()
         else:
