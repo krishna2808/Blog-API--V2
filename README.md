@@ -5,67 +5,109 @@ Welcome to the Blog API V2! This project is an advanced version of the Blog API,
 ## Table of Contents
 
 - [Features](#features)
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Endpoints](#endpoints)
+- [Running the Application](#running-the-application)
 - [Technologies Used](#technologies-used)
+- [Screenshots](#screenshots)
+- [Contributing](#contributing)
+- [Endpoints](#endpoints)
 - [Contributing](#contributing)
 - [License](#license)
+- 
 
 ## Features
 
-- User authentication and authorization
-- CRUD operations for blog posts
-- CRUD operations for comments
-- Pagination and filtering of blog posts
+- User authentication and authorization and Logout
 - JWT-based authentication
-- Secure password hashing
+- CRUD operations for blog posts
+- CRUD operations for comments and Like
+- Following (Friend Request) and Follower
+- Public and Private Post
+- Pagination and filtering of blog posts
+- Notification
+- **Chatting to user**
+- User authentication with JSON Web Tokens
+- Real-time chat with WebSockets
+- Create new chat rooms for Private message and Group message
+- Send and receive messages in real time
+- View the list of all users
+- View the history of previous messages
+- send files in chatroom
+- user online or offline or typing message other user can see.
+- user profile management.
+
+## Prerequisites
+
+#### Backend
+    - Python == 3.11.7
+    - Django == 4.0
+    - Redis server or you can use direct in-memory database in settings.py
+### Frontend
+    - node == 20.9.0
+    - npm == 10.1.0
+    - React
 
 ## Installation
 
-To install and run this project locally, follow these steps:
+ 1. Clone the repository:
 
-1. Clone the repository:
-
-    ```bash
+    ```sh
     git clone https://github.com/krishna2808/Blog-API--V2.git
-    ```
-
-2. Navigate to the project directory:
-
-    ```bash
     cd Blog-API--V2
     ```
 
-3. Install the dependencies:
+  ### Frontend Installation
+  
+  2. Install the dependencies for both the frontend and backend:
+  
+      ```sh
+      cd frontend && npm install
+      npm start
+      ```
 
-    ```bash
-    python3.10
-    pip install -r requirements.txt
+  ### Backend Installation
+  
+  3. Install the dependencies for the backend:
+  
+      ```sh
+      python3 -m venv venv 
+      source venv/bin/activate #Linux (activated venv)
+      cd backend 
+      pip install -r requirements.txt
+      python manage.py makemigrations 
+      python manage.py migrate # note if it will not proper migration then makemigrations and migrate with manually app
+      sudo apt-get install redis-server  # note if you don't want to use redis then in-memory database for development environment. 
+      sudo systemctl restart redis-server 
+      ```
+
+## Running the Application
+
+1. Start the backend server:
+
+    ```sh
+    cd backend
+    python manage.py runserver
     ```
 
-4. Set up the environment variables:
+2. In a separate terminal, start the frontend application:
 
-    Create a `.env` file in the root directory and add the following variables:
-
-    ```env
-    DATABASE_URL=your_database_url
-    JWT_SECRET=your_jwt_secret
-    ```
-
-5. Run the database migrations:
-
-    ```bash
-    npx sequelize-cli db:migrate
-    ```
-
-6. Start the server:
-
-    ```bash
+    ```sh
+    cd frontend
     npm start
     ```
 
-The server should now be running on `http://localhost:3000`.
+3. Open your browser and navigate to `http://localhost:3000` to see the application in action.
+
+## Technologies Used
+
+- **Sqlite**:  Database for storing data
+- **Django Rest Framework**: Drf framework for building REST APIs
+- **React**: Library for building user interfaces
+- **WebSockets channel**: Real-time communication between client and server
+- **JWT**: Authentication using JSON Web Tokens
+- **Redis server**: Redis server for Websocket.
+
 
 ## Usage
 
@@ -103,14 +145,7 @@ Here are some of the main endpoints available in this API:
 - **Update comment**: `PUT /api/comments/:id`
 - **Delete comment**: `DELETE /api/comments/:id`
 
-## Technologies Used
 
-- Node.js
-- Express.js
-- Sequelize (ORM)
-- PostgreSQL (Database)
-- JSON Web Tokens (JWT) for authentication
-- bcrypt for password hashing
 
 ## Contributing
 
