@@ -41,7 +41,7 @@ Welcome to the Blog API V2! This project is an advanced version of the Blog API,
 #### Backend
     - Python == 3.11.7
     - Django == 4.0
-    - Redis server or you can use direct in-memory database in settings.py
+    - Redis server or you can use direct in-memory database ( comment redis server and uncomment memory database from  settings.py
 ### Frontend
     - node == 20.9.0
     - npm == 10.1.0
