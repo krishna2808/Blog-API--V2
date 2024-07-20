@@ -65,7 +65,7 @@ class User(AbstractUser, PermissionsMixin):
     last_name = models.CharField(max_length=225, null=True, blank=True)
     mobile = models.CharField(max_length=225, null=True, blank=True)
     address = models.CharField(max_length=225, null=True, blank=True)
-    bio = models.TextField()  
+    bio = models.TextField(null=True, blank=True)  
     image = models.ImageField(
         null=True, 
         blank=True, 

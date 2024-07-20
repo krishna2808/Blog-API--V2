@@ -1,8 +1,19 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import *
 from rest_framework_simplejwt import views as jwt_views
+from rest_framework import permissions
+
+
+
+
+
+
+
+
 
 urlpatterns = [
+
+    
     path('signup/', AccountCreateAPI.as_view(), name="signup"),
     path('signin/', LoginView.as_view(), name="signin"),
     path('profile/', ProfileAPI.as_view(), name = "profile"),
@@ -13,4 +24,6 @@ urlpatterns = [
 
     #path('profile/<str:username>/', ProfileAPI.as_view(), name = "profile"),
     #path('account/<str:username>/', AccountAPI.as_view(), name="account"),
+    
+
 ]

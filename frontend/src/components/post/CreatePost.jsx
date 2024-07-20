@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import '../../assets/styles/main.css';
 import axios from 'axios';
 import Header from '../common/Header';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 const postCreateAndListAndUpdateDescostoryUrl = `${process.env.REACT_APP_BACKEND_API_URL}/post/`
 
@@ -44,9 +48,13 @@ function CreatePost() {
                     description: '',
                     image: null,
                 });
+                toast.success('Post Uploaded successfully!');
+
             })
             .catch(error => {
                 console.error('Error creating post:', error);
+                toast.error(`Error Uploading Post. Please try again.`);
+
             });
     };
 
@@ -71,6 +79,8 @@ function CreatePost() {
                     </div>
                     <button type="submit" className="btn btn-primary">Create Post</button>
                 </form>
+            <ToastContainer />
+            
             </div>
 
         </>

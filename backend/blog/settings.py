@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'daphne', # to run asgi server
     'django.contrib.staticfiles',
+    # Swagger API documentation
     'drf_yasg',
     # when rest_framework include in setting then it is given option to crud operation from brower and when you have installed pip install Markdown
     # 'rest_framework',

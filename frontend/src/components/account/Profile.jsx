@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../assets/styles/main.css';
 import Header from '../common/Header';
 
 const profileUrl = `${process.env.REACT_APP_BACKEND_API_URL}/account/profile/`
-
 
 function Profile() {
     const [user, setUser] = useState({
@@ -84,17 +85,19 @@ function Profile() {
         })
             .then(response => {
                 console.log('Profile updated successfully!', response.data);
+                toast.success('Profile updated successfully!');
             })
             .catch(error => {
                 console.error('Error updating profile:', error);
+                toast.error(`Error updating profile. Please try again.`);
             });
     };
 
     return (
         <>
             <Header />
-            <div class="create-post-container">               
-             <div className="profile-container">
+            <div className="create-post-container">
+                <div className="profile-container">
                     <h1>Profile</h1>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
@@ -146,13 +149,8 @@ function Profile() {
                         <button type="submit" className="btn-primary">Submit</button>
                     </form>
                 </div>
-
-        
-
-
+                <ToastContainer />
             </div>
-
-    
         </>
     );
 }
