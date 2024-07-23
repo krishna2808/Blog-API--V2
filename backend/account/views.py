@@ -20,6 +20,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework_simplejwt.tokens import AccessToken
 
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
+
 # Create your views here.
 
 
@@ -264,8 +269,11 @@ class ProfileAPI(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+        
     def delete(self, request):
         username = request.data.get('username')
+        if not username:
+            username = request.user.username
         user = User.objects.get(username = username)
         user.delete()
         return Response({"msg" : "User deleted"}, status=status.HTTP_204_NO_CONTENT) 

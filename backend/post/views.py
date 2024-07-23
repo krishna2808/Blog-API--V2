@@ -87,6 +87,8 @@ class PostCreateAndListAndUpdateDescostory(APIView):
             'follower_count' : len(follower)
 		}                 
         return Response({'own_post' : serializer.data, 'friends_context' : friends_context  }, status=status.HTTP_200_OK)
+
+
     def post(self, request, format=None):
         # post_data = request.data.copy()
         # post_data['user'] = request.user.id
